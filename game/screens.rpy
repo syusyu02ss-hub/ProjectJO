@@ -51,13 +51,13 @@ screen say(who, what):
     window:
         id "window"
         background Solid("#0b121af5")
-        xpos 0 ypos 777 xsize 1920 ysize 303
+        xfill True
+        yalign 1.0
+        ysize 303
         padding (150, 35)
         if who:
             text who id "who" size 26 color ACCENT ypos 0
-        text what id "what" xpos 0 ypos (48 if who else 26) xsize 1620 size 36 line_spacing 15
-    if not skip_locked:
-        text "클릭 / Enter  ›" xpos 1650 ypos 1035 size 18 color "#82969f"
+        text what id "what" ypos (48 if who else 26) xsize 1620 size 36 line_spacing 15
     use quick_menu
 
 screen quick_menu():
