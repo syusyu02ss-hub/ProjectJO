@@ -19,4 +19,7 @@ renpy-*-sdk/
 .DS_Store
 Thumbs.db
 desktop.ini
-
+.vscode/
+test-results/
+tests/screenshots/
+test-report*
