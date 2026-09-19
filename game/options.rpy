@@ -1,18 +1,18 @@
 define config.name = "온결 · 괜찮아지는 방"
-define config.version = "0.1.0"
+define config.version = "0.2.0"
 define config.window_title = "온결 — 제1장 괜찮아지는 방"
-define config.screen_width = 1280
-define config.screen_height = 720
+define config.screen_width = 1920
+define config.screen_height = 1080
 define config.save_directory = "OnGyeol-Chapter1-2026"
 define config.has_sound = True
 define config.has_music = True
 define config.has_voice = False
 define config.rollback_enabled = False
 define config.autosave_on_choice = False
-define config.autosave_on_quit = True
-define config.autosave_frequency = 100
+define config.autosave_on_quit = False
+define config.autosave_frequency = None
 define config.default_text_cps = 32
-define config.default_music_volume = 0.18
+define config.default_music_volume = 0.12
 define config.default_sfx_volume = 0.55
 define config.default_fullscreen = False
 define config.window = "auto"
@@ -26,11 +26,15 @@ default persistent.reduced_motion = False
 default persistent.show_hotspots = True
 
 init python:
-    build.name = "OnGyeol-0.1.0"
+    build.name = "OnGyeol-0.2.0"
     build.executable_name = "OnGyeol"
     build.include_update = False
     build.classify("game/tests.rpy", None)
     build.classify("game/tests.rpyc", None)
+    build.classify("tools/**", None)
+    build.classify(".git/**", None)
+    build.classify(".vscode/**", None)
+    build.classify("test-results/**", None)
     build.classify("game/saves/**", None)
     build.classify("game/cache/**", None)
     build.classify("**.log", None)
@@ -44,4 +48,3 @@ init python:
     build.documentation("CREDITS.md")
     renpy.music.register_channel("ambience", mixer="sfx", loop=True)
     renpy.music.register_channel("foley", mixer="sfx", loop=False)
-

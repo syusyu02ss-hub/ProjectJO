@@ -4,6 +4,7 @@ default notes = []
 default warnings = []
 default urgent_note_written = False
 default first_dejavu_seen = False
+default urgent_dejavu_seen = False
 default sorting_experienced = False
 default fail_call_count = 0
 default fail_judgment_count = 0
@@ -18,12 +19,17 @@ default chapter_complete = False
 default inspected = ""
 default call_resolved = False
 default clock_seconds = 0
+default opening_note_key = ""
+default opening_note_title = ""
+default opening_note_text = ""
+default opening_note_flags = ()
+default returning_from_sort = False
 
 init python:
     import math
     PAPER = "#eee4cf"
     INK = "#383d36"
-    ACCENT = "#c8b58a"
+    ACCENT = "#9ab3ba"
     HAND = "fonts/NanumPenScript-Regular.ttf"
     URGENT_NOTE = "검은 버튼. 노란 표시등.\n카메라는 카트의 태그를 본다."
     TRUST_LINE = "기억이 없다면 이 글부터 믿어. 네 글씨다."
@@ -39,14 +45,14 @@ init python:
               "문이 열려 있는 동안이 틈이다. 카트 뒤."]
     }
     OBJECTS = [
-        ("window", "창", 145, 204),
-        ("cup", "찻잔", 208, 452),
-        ("clock", "시계", 505, 119),
-        ("door", "문", 720, 306),
-        ("light", "표시등", 712, 35),
-        ("notice", "안내문", 910, 177),
-        ("call", "호출 버튼", 866, 278),
-        ("drawer", "서랍장", 1177, 423),
+        ("window", "창", 185, 371),
+        ("cup", "찻잔", 582, 720),
+        ("clock", "시계", 638, 317),
+        ("door", "문", 962, 473),
+        ("light", "표시등", 969, 242),
+        ("notice", "안내문", 1286, 383),
+        ("call", "호출 버튼", 1166, 489),
+        ("drawer", "서랍장", 1733, 660),
     ]
 
     def has(clue):
@@ -75,10 +81,10 @@ init python:
         store.wrong_choice_history[kind] += 1
         if kind == "A":
             store.fail_call_count += 1
-            level = store.fail_call_count
         else:
             store.fail_judgment_count += 1
-            level = store.fail_judgment_count
+        # B와 C도 서로의 실패로 힌트 단계가 올라가지 않는다.
+        level = store.wrong_choice_history[kind]
         first = HINTS[kind][0]
         if store.wrong_choice_history[kind] > 1:
             first = "{u}" + first + "{/u}"
@@ -88,25 +94,34 @@ init python:
         store.sorting_experienced = True
 
     def checkpoint():
-        if not renpy.is_in_test():
-            renpy.save("auto-1", extra_info="제1장 · " + ("배식 직전" if store.stage == "judgment" else "방 안"))
+        renpy.save("auto-1", extra_info="제1장 · " + ("열린 문" if store.stage == "judgment" else "호출 버튼"))
 
     def stop_fast_skip():
         renpy.config.skipping = None
+
+    def set_skip_lock(locked):
+        store.skip_locked = locked
+        renpy.config.allow_skipping = not locked
+        if locked:
+            stop_fast_skip()
+
+    def restore_skip_lock():
+        renpy.config.allow_skipping = not store.skip_locked
+
+    config.after_load_callbacks.append(restore_skip_lock)
 
     class RoomClock(renpy.Displayable):
         def render(self, width, height, st, at):
             r = renpy.Render(94, 94)
             c = r.canvas()
-            c.circle("#755c3f", (47, 47), 46)
-            c.circle("#d4c3a2", (47, 47), 42)
+            c.circle("#141b20", (47, 47), 46)
+            c.circle("#697375", (47, 47), 42)
             for i in range(12):
                 a = i * math.pi / 6
-                c.line("#5c503e", (47+math.sin(a)*35,47-math.cos(a)*35), (47+math.sin(a)*39,47-math.cos(a)*39), 2)
+                c.line("#20272b", (47+math.sin(a)*35,47-math.cos(a)*35), (47+math.sin(a)*39,47-math.cos(a)*39), 2)
             minute = store.wall_minutes % 60
             hour = (store.wall_minutes // 60) % 12
             for a,l,w in ((hour*math.pi/6+minute*math.pi/360,23,3),(minute*math.pi/30,34,2)):
-                c.line("#403a30", (47,47), (47+math.sin(a)*l,47-math.cos(a)*l), w)
-            c.circle("#403a30", (47,47),3)
+                c.line("#20272b", (47,47), (47+math.sin(a)*l,47-math.cos(a)*l), w)
+            c.circle("#20272b", (47,47),3)
             return r
-
