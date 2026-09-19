@@ -354,7 +354,7 @@ screen memory_portrait(expression):
     # 원본을 다시 그리지 않는다. 동일한 상반신 크롭과 색 필터만 적용한다.
     add Solid("#101820")
     add Solid("#75838d") xpos 1067 ypos 47 xsize 672 ysize 729
-    add Transform("images/dayoung_" + expression + ".png", crop=(0,0,1122,1200), xysize=(666,723), matrixcolor=TintMatrix("#b9c5cf") * BrightnessMatrix(-.13)) xpos 1070 ypos 50
+    add Transform("images/seoa_" + expression + ".png", crop=(0,0,1122,1200), xysize=(666,723), matrixcolor=TintMatrix("#b9c5cf") * BrightnessMatrix(-.13)) xpos 1070 ypos 50
     add Solid("#0b121a40") xpos 1070 ypos 50 xsize 666 ysize 723
     vbox:
         xpos 165 ypos 222 spacing 33
