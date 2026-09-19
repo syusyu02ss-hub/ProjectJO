@@ -1,0 +1,9 @@
+*.rpyc
+*.rpymc
+*.pyc
+saves/
+bytecode.rpy
+log.txt
+errors.txt
+traceback.txt
+**/cache/
