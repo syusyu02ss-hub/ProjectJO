@@ -1,9 +1,9 @@
-define config.name = "온결 · 괜찮아지는 방"
+define config.name = "평온의 방"
 define config.version = "0.2.0"
-define config.window_title = "온결 — 제1장 괜찮아지는 방"
+define config.window_title = "평온의 방"
 define config.screen_width = 1920
 define config.screen_height = 1080
-define config.save_directory = "OnGyeol-Chapter1-2026"
+define config.save_directory = "PyeongonuiBang-2026"
 define config.has_sound = True
 define config.has_music = True
 define config.has_voice = False
@@ -26,8 +26,8 @@ default persistent.reduced_motion = False
 default persistent.show_hotspots = True
 
 init python:
-    build.name = "OnGyeol-0.2.0"
-    build.executable_name = "OnGyeol"
+    build.name = "PyeongonuiBang-0.2.0"
+    build.executable_name = "PyeongonuiBang"
     build.include_update = False
     build.classify("game/tests.rpy", None)
     build.classify("game/tests.rpyc", None)

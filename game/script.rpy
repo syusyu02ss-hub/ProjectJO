@@ -24,17 +24,21 @@ label start:
     "로비에서 서아가 했던 말이 떠올랐다."
     hide screen room_clock
     scene black
-    show screen memory_portrait("neutral")
+    show screen memory_portrait("neutral", speaking=False)
     "몇 달 전, 우연히 알게 된 사람. 이직 이야기가 번번이 틀어졌을 때도 서아는 내 말을 끝까지 들어줬다."
+    show screen memory_portrait("neutral", speaking=True)
     seoa "긴장한 얼굴이네. 여기 사람들 다 좋아, 진짜."
+    show screen memory_portrait("neutral", speaking=False)
     su "너는 자주 와?"
-    show screen memory_portrait("soft")
+    show screen memory_portrait("soft", speaking=True)
     seoa "일 때문에 종종. 그리고… 전에도 도와준 사람이 있었어. 다들 잘 지내."
     "자랑하는 웃음이 아니었다. 좋은 소식을 전하는 사람의 웃음이었다."
     "온결의 사원 추천형 회복 프로그램. 직원인 서아는 외부인도 추천할 수 있다고 했다."
-    show screen memory_portrait("warm")
+    show screen memory_portrait("warm", speaking=True)
     seoa "나는 여기까지야. 거기 가면 다 괜찮아질 거야."
+    show screen memory_portrait("warm", speaking=False)
     su "끝나고 연락할게."
+    show screen memory_portrait("warm", speaking=True)
     seoa "응. 잘 다녀와."
     hide screen memory_portrait
     play sound "audio/door_close.wav"

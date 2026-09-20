@@ -13,6 +13,11 @@ init -2:
         color "#c7d2d9"
         hover_color "#ffffff"
         insensitive_color "#777a72"
+    style main_menu_button is button:
+        background Solid("#0b121ab8")
+        hover_background Solid("#9ab3ba55")
+    style main_menu_button_text is button_text:
+        xalign 0.5
     style frame:
         background Solid("#101820f5")
         padding (45, 39)
@@ -74,24 +79,20 @@ screen quick_menu():
 
 screen main_menu():
     tag menu
-    add "images/room_cold.png" xysize (1920,1080)
-    add Solid("#0c15244a")
-    add Solid("#0a1119e8") xpos 0 ypos 0 xsize 863 ysize 1080
-    add Solid("#81949b60") xpos 864 ypos 113 xsize 2 ysize 855
+    add Transform("images/room_cold.png", xysize=(1920,1080), matrixcolor=SaturationMatrix(.35) * BrightnessMatrix(-.32))
+    add Solid("#0710199c")
     vbox:
-        xpos 138 ypos 147 spacing 30
-        text "O N G Y E O L    /    0 7 1 3" size 21 color "#91a6b3"
-        null height 15
-        text "괜찮아지는 방" size 65 color "#e1e8ed"
-        text "이곳에서는 서두르지 않아도 됩니다." size 26 color "#9faeb8"
-        null height 63
-        textbutton "처음부터" id "start_game" action Start() xsize 503
-        textbutton "이어서" id "continue_game" action FileLoad("auto-1", confirm=False) sensitive FileLoadable("auto-1") xsize 503
-        textbutton "기록 불러오기" action ShowMenu("load") xsize 503
-        textbutton "환경 설정" action ShowMenu("preferences") xsize 503
-        textbutton "나가기" action Quit(confirm=False) xsize 503
-    text "기억이 없다면 이 글부터 믿어. 네 글씨다." xpos 141 ypos 945 font HAND size 41 color "#9baab1"
-    text "제1장  ·  텍스트와 소리로 읽는 미궁" xpos 141 ypos 1004 size 20 color "#81929c"
+        xalign .5 ypos 135 spacing 38
+        text "평온의 방" xalign .5 size 68 color "#e1e8ed"
+        null height 120
+        textbutton "시작하기" id "start_game" action Start() style "main_menu_button" xsize 510
+        textbutton "불러오기" id "load_game" action ShowMenu("load") style "main_menu_button" xsize 510
+        textbutton "설정" id "preferences" action ShowMenu("preferences") style "main_menu_button" xsize 510
+        textbutton "종료" id "quit_game" action Quit(confirm=False) style "main_menu_button" xsize 510
+
+label main_menu:
+    call screen main_menu
+    return
 
 screen investigation():
     modal True
@@ -266,16 +267,46 @@ screen preferences():
                     textbutton "창 모드" action Preference("display","window")
                     textbutton "전체 화면" action Preference("display","fullscreen")
                 text "글자 표시 속도" size 30
-                bar value Preference("text speed")
+                bar:
+                    value Preference("text speed")
+                    xsize 510
+                    ysize 24
+                    left_bar Solid("#9ab3ba")
+                    right_bar Solid("#334049")
+                    thumb Solid("#eee4cf", xsize=20, ysize=34)
+                hbox:
+                    xsize 510
+                    text "느리게" size 18 color "#83949c"
+                    text "빠르게" xalign 1.0 size 18 color "#83949c"
                 textbutton "조사 위치 표시" action ToggleField(persistent,"show_hotspots")
                 text "대사 넘기기: 클릭 / Enter / Space\n수첩: N   ·   설정: Esc\n읽은 문장만 빠르게: Ctrl / Tab" size 24 line_spacing 15 color "#9daea1"
             vbox:
                 spacing 33
                 text "소리" size 33 color ACCENT
                 text "효과음 · 환경음" size 30
-                bar value Preference("sound volume")
+                bar:
+                    value Preference("sound volume")
+                    xsize 510
+                    ysize 24
+                    left_bar Solid("#9ab3ba")
+                    right_bar Solid("#334049")
+                    thumb Solid("#eee4cf", xsize=20, ysize=34)
+                hbox:
+                    xsize 510
+                    text "작게" size 18 color "#83949c"
+                    text "크게" xalign 1.0 size 18 color "#83949c"
                 text "안내 음악" size 30
-                bar value Preference("music volume")
+                bar:
+                    value Preference("music volume")
+                    xsize 510
+                    ysize 24
+                    left_bar Solid("#9ab3ba")
+                    right_bar Solid("#334049")
+                    thumb Solid("#eee4cf", xsize=20, ysize=34)
+                hbox:
+                    xsize 510
+                    text "작게" size 18 color "#83949c"
+                    text "크게" xalign 1.0 size 18 color "#83949c"
                 textbutton "전체 음소거" action Preference("all mute", "toggle")
                 text "인물 음성은 사용하지 않습니다.\n안내 음악을 끄고 플레이해도 됩니다." size 24 line_spacing 14 color "#9daea1"
                 if not main_menu:
@@ -350,12 +381,19 @@ screen skip_indicator():
     zorder 110
     text "읽은 문장 넘기는 중" xpos 1545 ypos 33 size 23 color ACCENT
 
-screen memory_portrait(expression):
-    # 원본을 다시 그리지 않는다. 동일한 상반신 크롭과 색 필터만 적용한다.
+screen memory_portrait(expression, speaking=False):
+    # 수혁은 화면에 보이지 않는다. 서아의 상반신만 대사창 위에 두고,
+    # 수혁의 차례에는 서아를 듣는 쪽으로 어둡게 처리한다.
     add Solid("#101820")
     add Solid("#75838d") xpos 1067 ypos 47 xsize 672 ysize 729
-    add Transform("images/seoa_" + expression + ".png", crop=(0,0,1122,1200), xysize=(666,723), matrixcolor=TintMatrix("#b9c5cf") * BrightnessMatrix(-.13)) xpos 1070 ypos 50
-    add Solid("#0b121a40") xpos 1070 ypos 50 xsize 666 ysize 723
+    add Transform(
+        "images/seoa_cutout_" + expression + ".png",
+        crop=(0, 0, 1122, 1200),
+        xysize=(666, 723),
+        matrixcolor=(TintMatrix("#b9c5cf") * BrightnessMatrix(-.13) if speaking else SaturationMatrix(.18) * BrightnessMatrix(-.46))
+    ) xpos 1070 ypos 50
+    if not speaking:
+        add Solid("#06101870") xpos 1070 ypos 50 xsize 666 ysize 723
     vbox:
         xpos 165 ypos 222 spacing 33
         text "조금 전, 로비" size 23 color "#879fae"
