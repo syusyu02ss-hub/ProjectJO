@@ -6,8 +6,8 @@ default urgent_note_written = False
 default first_dejavu_seen = False
 default urgent_dejavu_seen = False
 default sorting_experienced = False
-default fail_call_count = 0
-default fail_judgment_count = 0
+default scene_sort_count = 0
+default full_sort = False
 default wrong_choice_history = {"A": 0, "B": 0, "C": 0}
 default fail_kind = "A"
 default latest_warning = ""
@@ -33,17 +33,34 @@ init python:
     HAND = "fonts/NanumPenScript-Regular.ttf"
     URGENT_NOTE = "검은 버튼. 노란 표시등.\n카메라는 카트의 태그를 본다."
     TRUST_LINE = "기억이 없다면 이 글부터 믿어. 네 글씨다."
-    HINTS = {
-        "A": ["호출 누르지 마. 사람이 온다. 도와주는 사람 아님.",
-              "노크가 너무 빨랐다. 문밖에서 기다리고 있었다.",
-              "호출은 도움 요청이 아니라 신고다."],
-        "B": ["직원한테 도움 청하지 마. 도와주는 사람 아님.",
-              "카메라는 카트를 본다. 그럼 카트가 가리는 곳은?",
-              "문이 열려 있는 동안이 틈이다. 카트 뒤."],
-        "C": ["뛰지 마. 직원은 뛰지 않았다. 뛸 필요가 없어서다.",
-              "카메라는 카트를 본다. 그럼 카트가 가리는 곳은?",
-              "문이 열려 있는 동안이 틈이다. 카트 뒤."]
+    HINT_DEFINITIONS = {
+        "A": {
+            "warnings": [
+                "호출 누르지 마. 사람이 온다. 도와주는 사람 아님.",
+                "{u}호출은 도움 요청이 아니라 신고다. 노크가 너무 빨랐다. 누르지 마.{/u}"
+            ],
+            "full_sort_detail": "호출은 도움이 아니라 접수였다. 안내자는 노크보다 먼저 와 있었다."
+        },
+        "B": {
+            "warnings": [
+                "직원한테 도움 청하지 마. 도와주는 사람 아님.",
+                "{u}카메라는 카트를 본다. 문이 열려 있는 동안이 틈이다. 카트 뒤.{/u}"
+            ],
+            "full_sort_detail": "그는 놀라지 않았다. 도움을 청하는 사람은 처음이 아니었다."
+        },
+        "C": {
+            "warnings": [
+                "뛰지 마. 직원은 뛰지 않았다. 뛸 필요가 없어서다.",
+                "{u}카메라는 카트를 본다. 문이 열려 있는 동안이 틈이다. 카트 뒤.{/u}"
+            ],
+            "full_sort_detail": "뛴 사람은 뛰지 않고도 잡혔다. 문은 애초에 닫힐 필요가 없었다."
+        }
     }
+    FULL_SORT_CARD = (
+        "온결 회복 프로그램 · 적응 안정 상담 3회",
+        "참가자 0713 · 정리 누적 3회",
+        "상태: 등록 요건 충족 → 정식 등록 완료"
+    )
     OBJECTS = [
         ("window", "창", 185, 371),
         ("cup", "찻잔", 582, 720),
@@ -79,19 +96,28 @@ init python:
     def write_failure(kind):
         store.fail_kind = kind
         store.wrong_choice_history[kind] += 1
-        if kind == "A":
-            store.fail_call_count += 1
-        else:
-            store.fail_judgment_count += 1
-        # B와 C도 서로의 실패로 힌트 단계가 올라가지 않는다.
-        level = store.wrong_choice_history[kind]
-        first = HINTS[kind][0]
-        if store.wrong_choice_history[kind] > 1:
-            first = "{u}" + first + "{/u}"
-        lines = [first] + HINTS[kind][1:min(level, 3)]
-        store.latest_warning = "\n\n".join(lines + [TRUST_LINE])
-        store.warnings.append((kind, level, store.latest_warning))
+        store.scene_sort_count += 1
         store.sorting_experienced = True
+        store.full_sort = store.scene_sort_count >= 3
+
+        # 정리 횟수는 저장되며, 실패 뒤에는 선택 전으로 되돌릴 수 없다.
+        renpy.block_rollback()
+
+        if store.full_sort:
+            return True
+
+        level = min(store.scene_sort_count, 2)
+        hint = HINT_DEFINITIONS[kind]["warnings"][level - 1]
+        store.latest_warning = "\n\n".join((hint, TRUST_LINE))
+        store.warnings.append((kind, level, store.latest_warning))
+        return False
+
+    def warning_page_text():
+        return "\n\n".join(content for _kind, _level, content in store.warnings)
+
+    def reset_scene_sort_count():
+        store.scene_sort_count = 0
+        store.full_sort = False
 
     def checkpoint():
         renpy.save("auto-1", extra_info="제1장 · " + ("열린 문" if store.stage == "judgment" else "호출 버튼"))

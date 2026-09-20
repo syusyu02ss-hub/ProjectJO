@@ -163,7 +163,7 @@ screen notebook():
             else:
                 if not warnings:
                     text "아직 아무것도 적혀 있지 않다." font HAND size 48 color INK
-                for kind, level, content in reversed(warnings):
+                for kind, level, content in warnings:
                     vbox:
                         spacing 14
                         text "접힌 페이지" size 21 color "#81725b"
@@ -173,7 +173,7 @@ screen notebook():
     key "K_n" action Hide("notebook")
     key "game_menu" action Hide("notebook")
 
-screen handwritten(content, title="수첩에 적는다", reveal=True):
+screen handwritten(content, title="수첩에 적는다", reveal=True, urgent=False):
     modal True
     zorder 120
     add Solid("#0c171773")
@@ -184,7 +184,7 @@ screen handwritten(content, title="수첩에 적는다", reveal=True):
         vbox:
             spacing 33
             text title size 23 color "#7f765f"
-            text content font HAND size 48 color INK line_spacing 9 slow_cps (24 if reveal else 0)
+            text content font HAND size (54 if urgent else 48) color ("#4d2f25" if urgent else INK) line_spacing 9 slow_cps (24 if reveal else 0)
             textbutton "펜을 놓는다" id "finish_writing" xalign 1.0 action Return() text_size 24 text_color "#6a654e" text_hover_color "#302f24"
 
 screen call_options():
@@ -223,16 +223,23 @@ screen judgment():
     key "K_n" action Show("notebook")
     key "game_menu" action ShowMenu("preferences")
 
-screen sorting_card():
+screen sorting_card(is_full_sort=False, kind="A"):
     modal True
     add Solid("#bfc8cc")
     vbox:
         xalign .5 yalign .46 spacing 39
-        text "온결 회복 프로그램" color "#4b5b66" size 27 xalign .5
-        text "적응 안정 상담" color "#283c4a" size 53 xalign .5
-        null height 18
-        text "참가자 0713   /   상태: 평온" color "#4b5b66" size 27 xalign .5
-        text "정리 완료" color "#455b68" size 38 xalign .5
+        if is_full_sort:
+            text FULL_SORT_CARD[0] color "#4b5b66" size 27 xalign .5
+            text FULL_SORT_CARD[1] color "#4b5b66" size 27 xalign .5
+            null height 12
+            text FULL_SORT_CARD[2] color "#283c4a" size 42 xalign .5
+            text HINT_DEFINITIONS[kind]["full_sort_detail"] color "#62707a" size 21 xalign .5
+        else:
+            text "온결 회복 프로그램" color "#4b5b66" size 27 xalign .5
+            text "적응 안정 상담" color "#283c4a" size 53 xalign .5
+            null height 18
+            text "참가자 0713   /   상태: 평온" color "#4b5b66" size 27 xalign .5
+            text "정리 완료" color "#455b68" size 38 xalign .5
     timer 3.0 action Return()
 
 screen end_chapter():

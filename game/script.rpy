@@ -200,6 +200,7 @@ label delivery:
             "글씨가 엉망이지만 알아볼 수는 있다."
         else:
             "수첩에 적힌 그대로였다. 검은 버튼, 노란 표시등."
+    label judgment_decision:
         $ stage = "judgment"
         $ stop_fast_skip()
         $ checkpoint()
@@ -209,6 +210,8 @@ label delivery:
             $ fail_kind = _return
             call failure
             call restore_after_sort
+            if _return == "judgment":
+                jump judgment_decision
             jump replay_delivery
     jump escape_room
 
@@ -242,9 +245,10 @@ label failure:
     guide "떠오르는 생각을 적어 보세요. 감정을 기록하면 편안해지거든요. 수첩은 가지고 계셔도 됩니다."
     "서랍에 눌려 있던 글씨. ‘그 뒤로 기억이…’"
     "지금 일을 잊게 된다면. 다음의 나에게 남겨야 한다."
-    $ write_failure(fail_kind)
-    play foley "audio/pen.wav"
-    call screen handwritten(latest_warning, "다음의 나에게", reveal=True)
+    $ full_sort = write_failure(fail_kind)
+    if not full_sort:
+        play foley "audio/pen.wav"
+        call screen handwritten(latest_warning, "다음의 나에게", reveal=True, urgent=(scene_sort_count == 2))
     hide screen room_clock
     scene room_after
     "조명이 흰색으로 바뀐다. 눈이 저절로 감긴다. 손목에 따뜻한 손이 얹힌다. 저릿하다."
@@ -254,10 +258,25 @@ label failure:
     guide "이제 괜찮아요. 잘하고 계세요."
     stop ambience
     window hide
-    call screen sorting_card
+    call screen sorting_card(full_sort, fail_kind)
     return
 
 label restore_after_sort:
+    if full_sort:
+        $ reset_scene_sort_count()
+        play ambience "audio/ticking.wav"
+        if fail_kind == "A":
+            scene room
+            $ wall_minutes = 1258
+            $ stage = "call"
+            show screen room_clock
+            return "call"
+        scene room
+        $ wall_minutes = 1270
+        $ stage = "judgment"
+        hide screen room_clock
+        show screen threshold_still
+        return "judgment"
     scene room
     $ wall_minutes = 1258 if fail_kind == "A" else 1269
     $ stage = "call" if fail_kind == "A" else "delivery"
@@ -281,7 +300,7 @@ label restore_after_sort:
         $ urgent_dejavu_seen = True
         $ set_skip_lock(False)
     "그 아래, 접힌 페이지에 다른 글이 있다."
-    call screen handwritten(latest_warning, "쓴 기억이 없는 내 글씨", reveal=False)
+    call screen handwritten(warning_page_text(), "쓴 기억이 없는 내 글씨", reveal=False)
     "기억은 없지만 글씨는 남았다. 지금은 이 글을 믿어야 한다."
     $ first_dejavu_seen = True
     if fail_kind == "A":
