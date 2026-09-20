@@ -18,6 +18,7 @@ define config.default_sfx_volume = 0.55
 define config.default_fullscreen = False
 define config.window = "auto"
 define config.history_length = 180
+define _game_menu_screen = "pause_menu"
 define config.enter_transition = Dissolve(0.15)
 define config.exit_transition = Dissolve(0.15)
 define config.intra_transition = Dissolve(0.15)
@@ -75,4 +76,12 @@ init python:
 
 label before_main_menu:
     $ normalize_text_cps()
+    return
+
+label enter_game_menu:
+    # 메뉴 컨텍스트에서만 일시 정지하며 복귀하면 본편의 재생 상태로 돌아간다.
+    $ renpy.music.set_pause(True, channel="music")
+    $ renpy.music.set_pause(True, channel="ambience")
+    $ renpy.music.set_pause(True, channel="sound")
+    $ renpy.music.set_pause(True, channel="foley")
     return

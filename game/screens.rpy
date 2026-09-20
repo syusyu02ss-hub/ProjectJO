@@ -63,20 +63,37 @@ screen say(who, what):
         if who:
             text who id "who" size 26 color ACCENT ypos 0
         text what id "what" ypos (48 if who else 26) xsize 1620 size 36 line_spacing 15
-    use quick_menu
-    key "game_menu" action ShowMenu("preferences")
+    key "game_menu" action ShowMenu("pause_menu")
 
-screen quick_menu():
-    zorder 90
-    if not main_menu and not skip_locked:
-        hbox:
-            xpos 48 ypos 20 spacing 9
-            textbutton "수첩" action Show("notebook") text_size 23 padding (18, 11) sensitive (stage != "intro")
-            textbutton "기록" action ShowMenu("history") text_size 23 padding (18, 11)
-            textbutton "저장" action ShowMenu("save") text_size 23 padding (18, 11)
-            textbutton "설정" action ShowMenu("preferences") text_size 23 padding (18, 11)
-            textbutton "읽은 문장 넘기기" action Skip() text_size 23 padding (18, 11)
-        key "K_n" action Show("notebook")
+define diary_reader = Character(None, screen="diary_reading")
+
+# Character의 기본 대사 입력 처리를 사용해 출력 속도와 즉시 표시를 유지한다.
+screen diary_reading(who, what):
+    add Solid("#060c13b8")
+    add Solid("#05090b90") xpos 220 ypos 208 xsize 1496 ysize 694
+    add Solid("#343b35") xpos 207 ypos 183 xsize 1506 ysize 708
+    add Solid("#a7aa99") xpos 226 ypos 195 xsize 1470 ysize 672
+    add Solid("#c7c8b8") xpos 237 ypos 201 xsize 1446 ysize 654
+    add Solid("#777d6b60") xpos 265 ypos 219 xsize 9 ysize 612
+    add Solid("#e0dfce45") xpos 280 ypos 219 xsize 3 ysize 612
+    for line_y in (426, 532, 638):
+        add Solid("#747d6925") xpos 321 ypos line_y xsize 1290 ysize 2
+    text "서랍 안쪽에서 발견한 일기" xpos 321 ypos 263 size 24 color "#626b60"
+    # 일반 say 화면의 하단 창 및 centered의 앵커를 상속하지 않는다.
+    window:
+        id "window"
+        background None
+        xpos 321 ypos 358 xanchor 0 yanchor 0
+        xsize 1290 ysize 330 padding (0, 0)
+        text what:
+            id "what"
+            xpos 0 ypos 0 xanchor 0 yanchor 0
+            xsize 1290 size 44 line_spacing 50
+            font "fonts/NanumPenScript-Regular.ttf"
+            color "#505955"
+            slow_cps True
+            slow_abortable True
+    key "game_menu" action ShowMenu("pause_menu")
 
 screen main_menu():
     tag menu
@@ -126,9 +143,9 @@ screen investigation():
             textbutton "수첩을 펼친다" id "open_notebook" action Show("notebook") text_size 26
             textbutton "설정" action ShowMenu("preferences") text_size 26
     key "K_n" action Show("notebook")
-    key "game_menu" action ShowMenu("preferences")
+    key "game_menu" action ShowMenu("pause_menu")
 
-screen notebook():
+screen notebook(menu_mode=False):
     modal True
     zorder 150
     default tab = note_focus
@@ -170,9 +187,9 @@ screen notebook():
                         text "접힌 페이지" size 21 color "#81725b"
                         text content font HAND size (50 if level > 1 else 47) color "#5c3d30" line_spacing 6
     text "이 수첩은 내 손을 떠나지 않았다." xpos 326 ypos 909 font HAND size 36 color "#7b765e"
-    textbutton "수첩 덮기" id "close_notebook" xpos 1355 ypos 890 action Hide("notebook") text_color INK text_hover_color "#a07146" text_size 27
-    key "K_n" action Hide("notebook")
-    key "game_menu" action ShowMenu("preferences")
+    textbutton "수첩 덮기" id "close_notebook" xpos 1355 ypos 890 action (Return() if menu_mode else Hide("notebook")) text_color INK text_hover_color "#a07146" text_size 27
+    key "K_n" action (Return() if menu_mode else Hide("notebook"))
+    key "game_menu" action ShowMenu("pause_menu")
 
 screen handwritten(content, title="수첩에 적는다", reveal=True, urgent=False):
     modal True
@@ -188,7 +205,7 @@ screen handwritten(content, title="수첩에 적는다", reveal=True, urgent=Fal
             # True는 사용자의 "글자 표시 속도" 환경 설정을 그대로 사용한다.
             text content font HAND size (54 if urgent else 48) color ("#4d2f25" if urgent else INK) line_spacing 9 slow_cps True slow_abortable True
             textbutton "펜을 놓는다" id "finish_writing" xalign 1.0 action Return() text_size 24 text_color "#6a654e" text_hover_color "#302f24"
-    key "game_menu" action ShowMenu("preferences")
+    key "game_menu" action ShowMenu("pause_menu")
 
 screen call_options():
     modal True
@@ -196,14 +213,24 @@ screen call_options():
         xpos 285 ypos 702 xsize 1350
         vbox:
             spacing 24
-            text "서랍에서 본 자국이 마음에 걸린다." size 33
+            text "서랍에서 읽은 일기가 마음에 걸린다." size 33
             hbox:
                 spacing 30
                 textbutton ("누른다" + ("  ·  지워지지 않은 경고" if wrong_choice_history["A"] else "")) id "call_yes" action Return(True)
                 textbutton "누르지 않는다" id "call_no" action Return(False)
                 textbutton "수첩" action Show("notebook")
     key "K_n" action Show("notebook")
-    key "game_menu" action ShowMenu("preferences")
+    key "game_menu" action ShowMenu("pause_menu")
+
+screen drawer_search():
+    modal True
+    frame:
+        xpos 285 ypos 702 xsize 1350
+        vbox:
+            spacing 24
+            text "서랍 안쪽이 바깥에서 본 것보다 얕다." size 33
+            textbutton "안쪽을 더듬는다" id "search_drawer_inner" action Return()
+    key "game_menu" action ShowMenu("pause_menu")
 
 screen judgment():
     modal True
@@ -225,7 +252,7 @@ screen judgment():
     if wrong_choice_history["B"] or wrong_choice_history["C"]:
         text "↺  수첩에 경고가 남은 선택" xpos 1011 ypos 1019 size 20 color "#c6b593"
     key "K_n" action Show("notebook")
-    key "game_menu" action ShowMenu("preferences")
+    key "game_menu" action ShowMenu("pause_menu")
 
 screen sorting_card(is_full_sort=False, kind="A"):
     modal True
@@ -245,7 +272,7 @@ screen sorting_card(is_full_sort=False, kind="A"):
             text "참가자 0713   /   상태: 평온" color "#4b5b66" size 27 xalign .5
             text "정리 완료" color "#455b68" size 38 xalign .5
     timer 3.0 action Return()
-    key "game_menu" action ShowMenu("preferences")
+    key "game_menu" action ShowMenu("pause_menu")
 
 screen end_chapter():
     modal True
@@ -259,97 +286,167 @@ screen end_chapter():
         text "이번 플레이 버전은 여기까지입니다." size 23 color "#839487" xalign .5
         textbutton "수첩을 다시 읽는다" action Show("notebook") xalign .5
         textbutton "처음 화면으로" id "chapter_done" action MainMenu(confirm=False) xalign .5
-    key "game_menu" action ShowMenu("preferences")
+    key "game_menu" action ShowMenu("pause_menu")
+
+screen menu_tabs():
+    hbox:
+        spacing 16
+        if not main_menu:
+            textbutton "수첩" action ShowMenu("notebook_menu") text_size 25
+            textbutton "기록" action ShowMenu("history") text_size 25
+            textbutton "저장" action ShowMenu("save") text_size 25
+        textbutton "불러오기" action ShowMenu("load") text_size 25
+        textbutton "설정" action ShowMenu("preferences") text_size 25
+        if not main_menu:
+            textbutton "인물" action ShowMenu("characters") text_size 25
 
 screen menu_shell(title):
     add Solid("#0f1e1df7")
-    text title xpos 117 ypos 83 size 53
-    textbutton "돌아가기" id "menu_back" xpos 1605 ypos 75 action Return() text_size 27
+    text title xpos 117 ypos 65 size 53
+    textbutton ("돌아가기" if main_menu else "계속하기") id "menu_back" xpos 1605 ypos 65 action Return() text_size 27
+    fixed:
+        xpos 117 ypos 139 xsize 1550 ysize 70
+        use menu_tabs
     key "game_menu" action Return()
     transclude
 
+screen pause_menu():
+    tag menu
+    use menu_shell("메뉴"):
+        vbox:
+            xalign .5 ypos 380 spacing 30
+            text "잠시, 숨을 고른다." font HAND size 54 color ACCENT
+            textbutton "계속하기" action Return() xalign .5
+            textbutton "처음 화면으로" action MainMenu() xalign .5
+
+screen notebook_menu():
+    tag menu
+    use notebook(menu_mode=True)
+    fixed:
+        xpos 310 ypos 0 xsize 1400 ysize 70
+        use menu_tabs
+    key "game_menu" action Return()
+
+screen characters():
+    tag menu
+    default selected_person = "suhyeok"
+    use menu_shell("인물"):
+        vbox:
+            xpos 130 ypos 270 spacing 24
+            textbutton "김수혁" action SetScreenVariable("selected_person", "suhyeok")
+            textbutton "윤서아" action SetScreenVariable("selected_person", "seoa")
+            if has("diary_found"):
+                textbutton "기록 속 인물 · 0611" action SetScreenVariable("selected_person", "0611")
+        add Solid("#222e32") xpos 580 ypos 260 xsize 540 ysize 660
+        if selected_person == "suhyeok":
+            add Transform("images/suhyeok_profile.png", crop=(0, 0, 1024, 1250), xysize=(540, 660)) xpos 580 ypos 260
+        elif selected_person == "seoa":
+            add Transform("images/seoa_cutout_neutral.png", crop=(0, 0, 1122, 1370), xysize=(540, 660)) xpos 580 ypos 260
+        else:
+            # 신원을 암시하지 않는 임시 상반신 실루엣.
+            add "images/unknown_profile.svg" xpos 580 ypos 260
+            text "?" xpos 819 ypos 510 size 68 color "#7b8b8d"
+        vbox:
+            xpos 1190 ypos 330 xsize 590 spacing 35
+            if selected_person == "suhyeok":
+                text "김수혁" size 46
+                text "참가 번호 0713" size 27 color ACCENT
+                text "뭐든 적어 두는 사람.\n적어 두지 않으면 불안하다." size 30 line_spacing 18
+            elif selected_person == "seoa":
+                text "윤서아" size 46
+                text "내 말을 끝까지 들어주던 사람." size 30
+                text "온결의 회복 프로그램을 소개해 주었다." size 28
+            else:
+                text "기록 속 인물 · 0611" size 42
+                text "이름과 얼굴은 아직 모른다." size 29 color ACCENT
+                text "서랍 안쪽에 일기를 남겼다.\n호출 뒤의 기억이 없다고 적었다." size 28 line_spacing 18
+
 screen preferences():
     tag menu
-    on "show" action PauseAudio("music", True)
-    on "hide" action PauseAudio("music", False)
     use menu_shell("환경 설정"):
-        hbox:
-            xpos 128 ypos 239 spacing 218
-            vbox:
-                spacing 33
-                text "화면" size 33 color ACCENT
-                hbox:
-                    textbutton "창 모드" action Preference("display","window")
-                    textbutton "전체 화면" action Preference("display","fullscreen")
-                text "글자 표시 속도" size 30
-                bar:
-                    # 0(즉시 표시)을 제외해, 가장 빠른 설정에서도 타이핑이 보인다.
-                    value FieldValue(_preferences, "text_cps", min=TEXT_CPS_MIN, max=TEXT_CPS_MAX, step=1, force_step=True, style="slider")
-                    xsize 510
-                    ysize 24
-                    left_bar Solid("#9ab3ba")
-                    right_bar Solid("#334049")
-                    thumb Solid("#eee4cf", xsize=20, ysize=34)
-                hbox:
-                    xsize 510
-                    text "느리게" size 18 color "#83949c"
-                    text "빠르게" xalign 1.0 size 18 color "#83949c"
-                textbutton "조사 위치 표시" action ToggleField(persistent,"show_hotspots")
-                text "대사·기록 넘기기: 클릭 / Enter / Space\n수첩: N   ·   설정: Esc\n읽은 문장만 빠르게: Ctrl / Tab" size 24 line_spacing 15 color "#9daea1"
-            vbox:
-                spacing 33
-                text "소리" size 33 color ACCENT
+        viewport:
+            xpos 128 ypos 239 xsize 1650 ysize 790
+            mousewheel True
+            draggable False
+            scrollbars "vertical"
+            hbox:
+                spacing 218
                 vbox:
                     spacing 33
-                    text "효과음 · 환경음" size 30 color ("#627078" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#dce2e5")
-                    if _preferences.get_mute("music") and _preferences.get_mute("sfx"):
-                        bar:
-                            value StaticValue(_preferences.get_mixer("sfx"), 1.0)
-                            xsize 510
-                            ysize 24
-                            left_bar Solid("#4c5b63")
-                            right_bar Solid("#29343b")
-                            thumb Solid("#69767b", xsize=20, ysize=34)
-                    else:
-                        bar:
-                            value Preference("sound volume")
-                            xsize 510
-                            ysize 24
-                            left_bar Solid("#9ab3ba")
-                            right_bar Solid("#334049")
-                            thumb Solid("#eee4cf", xsize=20, ysize=34)
+                    text "화면" size 33 color ACCENT
+                    hbox:
+                        textbutton "창 모드" action Preference("display","window")
+                        textbutton "전체 화면" action Preference("display","fullscreen")
+                    text "글자 표시 속도" size 30
+                    bar:
+                        # 0(즉시 표시)을 제외해, 가장 빠른 설정에서도 타이핑이 보인다.
+                        value FieldValue(_preferences, "text_cps", min=TEXT_CPS_MIN, max=TEXT_CPS_MAX, step=1, force_step=True, style="slider")
+                        xsize 510
+                        ysize 24
+                        left_bar Solid("#9ab3ba")
+                        right_bar Solid("#334049")
+                        thumb Solid("#eee4cf", xsize=20, ysize=34)
                     hbox:
                         xsize 510
-                        text "작게" size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
-                        text "크게" xalign 1.0 size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
-                    text "안내 음악" size 30 color ("#627078" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#dce2e5")
+                        text "느리게" size 18 color "#83949c"
+                        text "빠르게" xalign 1.0 size 18 color "#83949c"
+                    textbutton "조사 위치 표시" action ToggleField(persistent,"show_hotspots")
+                    text "대사·기록 넘기기: 클릭 / Enter / Space\n수첩: N   ·   메뉴: Esc\n읽은 문장만 빠르게: Ctrl / Tab" size 24 line_spacing 15 color "#9daea1"
+                vbox:
+                    spacing 33
+                    text "소리" size 33 color ACCENT
+                    vbox:
+                        spacing 33
+                        text "효과음 · 환경음" size 30 color ("#627078" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#dce2e5")
+                        if _preferences.get_mute("music") and _preferences.get_mute("sfx"):
+                            bar:
+                                value StaticValue(_preferences.get_mixer("sfx"), 1.0)
+                                xsize 510
+                                ysize 24
+                                left_bar Solid("#4c5b63")
+                                right_bar Solid("#29343b")
+                                thumb Solid("#69767b", xsize=20, ysize=34)
+                        else:
+                            bar:
+                                value Preference("sound volume")
+                                xsize 510
+                                ysize 24
+                                left_bar Solid("#9ab3ba")
+                                right_bar Solid("#334049")
+                                thumb Solid("#eee4cf", xsize=20, ysize=34)
+                        hbox:
+                            xsize 510
+                            text "작게" size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
+                            text "크게" xalign 1.0 size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
+                        text "안내 음악" size 30 color ("#627078" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#dce2e5")
+                        if _preferences.get_mute("music") and _preferences.get_mute("sfx"):
+                            bar:
+                                value StaticValue(_preferences.get_mixer("music"), 1.0)
+                                xsize 510
+                                ysize 24
+                                left_bar Solid("#4c5b63")
+                                right_bar Solid("#29343b")
+                                thumb Solid("#69767b", xsize=20, ysize=34)
+                        else:
+                            bar:
+                                value Preference("music volume")
+                                xsize 510
+                                ysize 24
+                                left_bar Solid("#9ab3ba")
+                                right_bar Solid("#334049")
+                                thumb Solid("#eee4cf", xsize=20, ysize=34)
+                        hbox:
+                            xsize 510
+                            text "작게" size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
+                            text "크게" xalign 1.0 size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
+                    textbutton ("음소거 해제" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "전체 음소거") action Preference("all mute", "toggle")
                     if _preferences.get_mute("music") and _preferences.get_mute("sfx"):
-                        bar:
-                            value StaticValue(_preferences.get_mixer("music"), 1.0)
-                            xsize 510
-                            ysize 24
-                            left_bar Solid("#4c5b63")
-                            right_bar Solid("#29343b")
-                            thumb Solid("#69767b", xsize=20, ysize=34)
-                    else:
-                        bar:
-                            value Preference("music volume")
-                            xsize 510
-                            ysize 24
-                            left_bar Solid("#9ab3ba")
-                            right_bar Solid("#334049")
-                            thumb Solid("#eee4cf", xsize=20, ysize=34)
-                    hbox:
-                        xsize 510
-                        text "작게" size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
-                        text "크게" xalign 1.0 size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
-                textbutton ("음소거 해제" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "전체 음소거") action Preference("all mute", "toggle")
-                if _preferences.get_mute("music") and _preferences.get_mute("sfx"):
-                    text "전체 음소거 적용 중" size 21 color "#829199"
-                text "인물 음성은 사용하지 않습니다.\n안내 음악을 끄고 플레이해도 됩니다." size 24 line_spacing 14 color "#9daea1"
-                if not main_menu:
-                    textbutton "처음 화면으로" action MainMenu()
-                textbutton "게임 종료" action Quit()
+                        text "전체 음소거 적용 중" size 21 color "#829199"
+                    text "인물 음성은 사용하지 않습니다.\n안내 음악을 끄고 플레이해도 됩니다." size 24 line_spacing 14 color "#9daea1"
+                    if not main_menu:
+                        textbutton "처음 화면으로" action MainMenu()
+                    textbutton "게임 종료" action Quit()
+
 
 screen save():
     tag menu
@@ -461,17 +558,4 @@ screen notice_page():
             null height 12
             text "이곳에서는 서두르지 않아도 됩니다.\n저녁 배식은 21시 10분입니다.\n안내자는 항상 두 번 노크합니다.\n불편하신 점은 호출 버튼으로 알려 주세요.\n언제든 도와드리겠습니다.\n스스로를 탓하지 마세요." size 33 color "#2c3b44" line_spacing 21 slow_cps True slow_abortable True
             textbutton "안내문에서 눈을 뗀다" id "close_notice" action Return() text_color "#465e6e" text_hover_color "#1b2e3d" xalign 1.0 text_size 24
-    key "game_menu" action ShowMenu("preferences")
-
-screen evidence_fragment():
-    modal True
-    add Solid("#060c13b0")
-    frame:
-        xalign .5 yalign .45 xsize 1193 padding (75,63)
-        background Solid("#c0c5c0")
-        vbox:
-            spacing 38
-            text "서랍 안쪽 / 뜯긴 종이" size 21 color "#526365"
-            text "…호출을 누르고…\n상담사가 와서… 괜찮다고…\n차는 따뜻했다…\n그 뒤로 기억이…\n뭘 하고 있었더라…" font HAND size 56 color "#424e50" line_spacing 15 slow_cps True slow_abortable True
-            textbutton "종이를 내려놓는다" id "close_fragment" action Return() text_size 26 text_color "#465e6e" text_hover_color "#1b2e3d" xalign 1.0
-    key "game_menu" action ShowMenu("preferences")
+    key "game_menu" action ShowMenu("pause_menu")

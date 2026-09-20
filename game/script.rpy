@@ -108,15 +108,24 @@ label inspect_light:
 label inspect_drawer:
     play sound "audio/drawer.wav"
     "첫 서랍에는 같은 표지의 새 수첩과 펜, 티슈가 들어 있다."
-    "두 번째 서랍은 뻑뻑하다. 안쪽에서 뜯겨 나간 수첩 페이지의 귀퉁이가 나온다."
-    "글씨는 없다. 스탠드 불빛을 비스듬히 비추자 눌린 자국이 드러난다."
-    call screen evidence_fragment
-    "서랍 안쪽 벽에는 이름표를 붙였다 뗀 자국이 있다. 그 위를 누군가 문질러 지운 흔적이 남아 있다."
-    call record_note("drawer", "눌린 글씨", "호출 → 상담사 → 기억이 끊김\n서랍 안쪽 이름표 자리, 지워짐", ("drawer_marks", "name_tag_erased"))
+    "두 번째 서랍은 뻑뻑하다. 안쪽이 바깥에서 본 깊이보다 얕다."
+    window hide
+    call screen drawer_search
+    window show
+    "손끝으로 안쪽을 더듬자, 얇은 틈에 납작한 수첩 하나가 걸린다."
+    "표지는 손때로 검고, 첫 장에는 같은 사람이 며칠에 걸쳐 적은 글이 남아 있다."
+    window hide
+    diary_reader "[DRAWER_DIARY_PAGES[0]]"
+    diary_reader "[DRAWER_DIARY_PAGES[1]]"
+    window show
+    "[DRAWER_DIARY_MONOLOGUES[0]]"
+    "[DRAWER_DIARY_MONOLOGUES[1]]"
+    "일기 옆에는 이름표를 붙였다 떼어 낸 자리만 남아 있다."
+    call record_note("drawer", "이전 사람의 일기", DRAWER_DIARY_NOTE, ("drawer_marks", "name_tag_erased", "diary_found", "diary_number"))
     $ mark_observed("drawer")
     # 마지막 필수 조사여도 함정 조사 기회를 잃지 않도록 한 번 연결한다.
     if not call_resolved:
-        "문 옆의 호출 버튼이 눈에 들어온다. 방금 읽은 자국이 마음에 걸린다."
+        "문 옆의 호출 버튼이 눈에 들어온다. 방금 읽은 일기가 마음에 걸린다."
         call inspect_call
     return
 

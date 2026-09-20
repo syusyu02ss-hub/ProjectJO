@@ -59,7 +59,7 @@
 
 ## 플래그와 단서 ID
 - 플래그 이름은 의미를 정확히 반영한다. (예: `call_button_rule`은 "호출을 권하는 안내문을 읽었다"는 뜻이다. 안전하다는 뜻으로 읽히는 이름은 피한다.)
-- 단서 ID: `rule_knock`, `meal_2110`, `call_button_rule`, `drawer_marks`, `name_tag_erased`, `clock_same`, `seoa_line`, `light_green`, `black_button`, `camera_cart`
+- 단서 ID: `rule_knock`, `meal_2110`, `call_button_rule`, `drawer_marks`, `name_tag_erased`, `diary_found`, `diary_number`, `clock_same`, `seoa_line`, `light_green`, `black_button`, `camera_cart`
 - `urgent_note_written`: 켜져 있으면 급한 메모 쓰기 연출을 건너뛴다. 첫 시도에만 쓴다.
 - 정리 횟수와 힌트 단계는 롤백에 영향받지 않는 값으로 저장한다.
 
@@ -75,6 +75,6 @@
 - 사용한 에셋과 폰트의 출처와 라이선스는 `CREDITS.md`에 기록한다.
 
 ## 하지 않는 것
-- 주인공의 몸이나 얼굴을 그리지 않는다. 손, 수첩, 시점 화면만 쓴다.
+- 본편에서는 주인공의 몸이나 얼굴을 그리지 않는다. 손, 수첩, 시점 화면만 쓴다. 인물 탭에서는 사용자 제공 김수혁 초상화를 표시한다.
 - 죽음, 신체 훼손, 잔혹 묘사를 넣지 않는다.
 - 요청 없이 장면을 추가하거나 분량을 늘리지 않는다.

@@ -34,6 +34,15 @@ init python:
     ACCENT = "#9ab3ba"
     HAND = "fonts/NanumSmile.ttf"
     URGENT_NOTE = "검은 버튼. 노란 표시등.\n카메라는 카트의 태그를 본다."
+    DRAWER_DIARY_PAGES = (
+        "{font=fonts/NanumPenScript-Regular.ttf}{color=#59615d}참가 번호 0611. 이건 잊지 말자.\n첫째 날. 차가 따뜻했다. 다들 친절하다. 오래 잤다.\n둘째 날. 어제 뭘 했더라. 수첩에 적힌 건 내 글씨가 맞다.{/color}{/font}",
+        "{font=fonts/NanumPenScript-Regular.ttf}{color=#505955}셋째 날. 호출하면 사람이 온다. 온 뒤는 기억이 없다.\n이름이 뭐였지. 이름표 자리만 남았다.\n이걸 읽으면 알아둬. 여기서는 괜찮다는 말이 제일 위험하다.{/color}{/font}"
+    )
+    DRAWER_DIARY_MONOLOGUES = (
+        "이 사람이 어떻게 됐는지는 모른다.",
+        "다만 이 방에서 나갈 방법을 찾지 않으면, 나도 이 글의 다음 줄이 된다."
+    )
+    DRAWER_DIARY_NOTE = "이전 사람의 일기: 호출 → 사람 → 기억이 끊김\n참가 번호 0611"
     TRUST_LINE = "기억이 없다면 이 글부터 믿어. 네 글씨다."
     HINT_DEFINITIONS = {
         "A": {
