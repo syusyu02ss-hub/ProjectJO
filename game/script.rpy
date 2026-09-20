@@ -9,11 +9,11 @@ image black = Solid("#070b10")
 image room_after = Transform("images/room_cold.png", xysize=(1920, 1080), matrixcolor=SaturationMatrix(.2) * BrightnessMatrix(.14))
 
 label start:
+    $ begin_sort_run()
     $ set_skip_lock(False)
     $ stage = "intro"
     scene room
     show screen room_clock
-    play ambience "audio/ticking.wav"
     play music "audio/guide_music.wav" fadein 2.0
     "문이 닫혔다. 잠기는 소리는 없었다. 조용히 닫히는 문이었다."
     "방은 나쁘지 않았다. 소파, 찻잔, 벽시계. 호텔방 같기도 하고 상담실 같기도 했다."
@@ -205,7 +205,9 @@ label delivery:
         $ stop_fast_skip()
         $ checkpoint()
         window hide
+        play ambience "audio/ticking.wav" fadein .2
         call screen judgment
+        stop ambience fadeout .2
         if _return != "success":
             $ fail_kind = _return
             call failure
@@ -235,6 +237,9 @@ label failure:
         "직원은 뛰지 않는다. 뛸 필요가 없다는 듯이."
         "복도 끝에서 같은 유니폼 두 사람이 서두르지 않고 걸어온다."
         "나는 그들 사이로 다시 방에 들어온다. 문은 조용히 닫힌다."
+    $ full_sort = write_failure(fail_kind)
+    if full_sort:
+        jump complete_sort
     hide screen threshold_still
     scene room
     show screen room_clock
@@ -245,10 +250,11 @@ label failure:
     guide "떠오르는 생각을 적어 보세요. 감정을 기록하면 편안해지거든요. 수첩은 가지고 계셔도 됩니다."
     "서랍에 눌려 있던 글씨. ‘그 뒤로 기억이…’"
     "지금 일을 잊게 된다면. 다음의 나에게 남겨야 한다."
-    $ full_sort = write_failure(fail_kind)
-    if not full_sort:
-        play foley "audio/pen.wav"
-        call screen handwritten(latest_warning, "다음의 나에게", reveal=True, urgent=(scene_sort_count == 2))
+    "[SORT_MONOLOGUES['normal'][0]]"
+    play foley "audio/pen.wav"
+    call screen handwritten(latest_warning, "다음의 나에게", reveal=True, urgent=(scene_sort_count == 2))
+    "[SORT_MONOLOGUES['normal'][1]]"
+    "[SORT_MONOLOGUES['normal'][2]]"
     hide screen room_clock
     scene room_after
     "조명이 흰색으로 바뀐다. 눈이 저절로 감긴다. 손목에 따뜻한 손이 얹힌다. 저릿하다."
@@ -261,27 +267,32 @@ label failure:
     call screen sorting_card(full_sort, fail_kind)
     return
 
+label complete_sort:
+    # 완전 정리는 수첩이나 일반 정리의 복귀 연출을 거치지 않는다.
+    hide screen threshold_still
+    hide screen room_clock
+    stop music fadeout .5
+    scene room_after
+    with Dissolve(.2)
+    "[SORT_MONOLOGUES['complete'][0]]"
+    "[SORT_MONOLOGUES['complete'][1]]"
+    "[SORT_MONOLOGUES['complete'][2]]"
+    "[SORT_MONOLOGUES['complete'][3]]"
+    "[SORT_MONOLOGUES['complete'][4]]"
+    scene black
+    window hide
+    call screen sorting_card(True, fail_kind)
+    scene black
+    pause .5
+    $ reset_scene1_state()
+    $ set_skip_lock(False)
+    jump start
+
 label restore_after_sort:
-    if full_sort:
-        $ reset_scene_sort_count()
-        play ambience "audio/ticking.wav"
-        if fail_kind == "A":
-            scene room
-            $ wall_minutes = 1258
-            $ stage = "call"
-            show screen room_clock
-            return "call"
-        scene room
-        $ wall_minutes = 1270
-        $ stage = "judgment"
-        hide screen room_clock
-        show screen threshold_still
-        return "judgment"
     scene room
     $ wall_minutes = 1258 if fail_kind == "A" else 1269
     $ stage = "call" if fail_kind == "A" else "delivery"
     show screen room_clock
-    play ambience "audio/ticking.wav"
     "눈을 뜬다. 손에 펜이 쥐어져 있다. 무엇을 하려던 참이었지."
     if not first_dejavu_seen:
         $ set_skip_lock(True)

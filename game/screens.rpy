@@ -64,6 +64,7 @@ screen say(who, what):
             text who id "who" size 26 color ACCENT ypos 0
         text what id "what" ypos (48 if who else 26) xsize 1620 size 36 line_spacing 15
     use quick_menu
+    key "game_menu" action ShowMenu("preferences")
 
 screen quick_menu():
     zorder 90
@@ -171,7 +172,7 @@ screen notebook():
     text "이 수첩은 내 손을 떠나지 않았다." xpos 326 ypos 909 font HAND size 36 color "#7b765e"
     textbutton "수첩 덮기" id "close_notebook" xpos 1355 ypos 890 action Hide("notebook") text_color INK text_hover_color "#a07146" text_size 27
     key "K_n" action Hide("notebook")
-    key "game_menu" action Hide("notebook")
+    key "game_menu" action ShowMenu("preferences")
 
 screen handwritten(content, title="수첩에 적는다", reveal=True, urgent=False):
     modal True
@@ -184,8 +185,10 @@ screen handwritten(content, title="수첩에 적는다", reveal=True, urgent=Fal
         vbox:
             spacing 33
             text title size 23 color "#7f765f"
-            text content font HAND size (54 if urgent else 48) color ("#4d2f25" if urgent else INK) line_spacing 9 slow_cps (24 if reveal else 0)
+            # True는 사용자의 "글자 표시 속도" 환경 설정을 그대로 사용한다.
+            text content font HAND size (54 if urgent else 48) color ("#4d2f25" if urgent else INK) line_spacing 9 slow_cps True slow_abortable True
             textbutton "펜을 놓는다" id "finish_writing" xalign 1.0 action Return() text_size 24 text_color "#6a654e" text_hover_color "#302f24"
+    key "game_menu" action ShowMenu("preferences")
 
 screen call_options():
     modal True
@@ -200,6 +203,7 @@ screen call_options():
                 textbutton "누르지 않는다" id "call_no" action Return(False)
                 textbutton "수첩" action Show("notebook")
     key "K_n" action Show("notebook")
+    key "game_menu" action ShowMenu("preferences")
 
 screen judgment():
     modal True
@@ -241,6 +245,7 @@ screen sorting_card(is_full_sort=False, kind="A"):
             text "참가자 0713   /   상태: 평온" color "#4b5b66" size 27 xalign .5
             text "정리 완료" color "#455b68" size 38 xalign .5
     timer 3.0 action Return()
+    key "game_menu" action ShowMenu("preferences")
 
 screen end_chapter():
     modal True
@@ -254,6 +259,7 @@ screen end_chapter():
         text "이번 플레이 버전은 여기까지입니다." size 23 color "#839487" xalign .5
         textbutton "수첩을 다시 읽는다" action Show("notebook") xalign .5
         textbutton "처음 화면으로" id "chapter_done" action MainMenu(confirm=False) xalign .5
+    key "game_menu" action ShowMenu("preferences")
 
 screen menu_shell(title):
     add Solid("#0f1e1df7")
@@ -264,6 +270,8 @@ screen menu_shell(title):
 
 screen preferences():
     tag menu
+    on "show" action PauseAudio("music", True)
+    on "hide" action PauseAudio("music", False)
     use menu_shell("환경 설정"):
         hbox:
             xpos 128 ypos 239 spacing 218
@@ -275,7 +283,8 @@ screen preferences():
                     textbutton "전체 화면" action Preference("display","fullscreen")
                 text "글자 표시 속도" size 30
                 bar:
-                    value Preference("text speed")
+                    # 0(즉시 표시)을 제외해, 가장 빠른 설정에서도 타이핑이 보인다.
+                    value FieldValue(_preferences, "text_cps", min=TEXT_CPS_MIN, max=TEXT_CPS_MAX, step=1, force_step=True, style="slider")
                     xsize 510
                     ysize 24
                     left_bar Solid("#9ab3ba")
@@ -286,35 +295,57 @@ screen preferences():
                     text "느리게" size 18 color "#83949c"
                     text "빠르게" xalign 1.0 size 18 color "#83949c"
                 textbutton "조사 위치 표시" action ToggleField(persistent,"show_hotspots")
-                text "대사 넘기기: 클릭 / Enter / Space\n수첩: N   ·   설정: Esc\n읽은 문장만 빠르게: Ctrl / Tab" size 24 line_spacing 15 color "#9daea1"
+                text "대사·기록 넘기기: 클릭 / Enter / Space\n수첩: N   ·   설정: Esc\n읽은 문장만 빠르게: Ctrl / Tab" size 24 line_spacing 15 color "#9daea1"
             vbox:
                 spacing 33
                 text "소리" size 33 color ACCENT
-                text "효과음 · 환경음" size 30
-                bar:
-                    value Preference("sound volume")
-                    xsize 510
-                    ysize 24
-                    left_bar Solid("#9ab3ba")
-                    right_bar Solid("#334049")
-                    thumb Solid("#eee4cf", xsize=20, ysize=34)
-                hbox:
-                    xsize 510
-                    text "작게" size 18 color "#83949c"
-                    text "크게" xalign 1.0 size 18 color "#83949c"
-                text "안내 음악" size 30
-                bar:
-                    value Preference("music volume")
-                    xsize 510
-                    ysize 24
-                    left_bar Solid("#9ab3ba")
-                    right_bar Solid("#334049")
-                    thumb Solid("#eee4cf", xsize=20, ysize=34)
-                hbox:
-                    xsize 510
-                    text "작게" size 18 color "#83949c"
-                    text "크게" xalign 1.0 size 18 color "#83949c"
-                textbutton "전체 음소거" action Preference("all mute", "toggle")
+                vbox:
+                    spacing 33
+                    text "효과음 · 환경음" size 30 color ("#627078" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#dce2e5")
+                    if _preferences.get_mute("music") and _preferences.get_mute("sfx"):
+                        bar:
+                            value StaticValue(_preferences.get_mixer("sfx"), 1.0)
+                            xsize 510
+                            ysize 24
+                            left_bar Solid("#4c5b63")
+                            right_bar Solid("#29343b")
+                            thumb Solid("#69767b", xsize=20, ysize=34)
+                    else:
+                        bar:
+                            value Preference("sound volume")
+                            xsize 510
+                            ysize 24
+                            left_bar Solid("#9ab3ba")
+                            right_bar Solid("#334049")
+                            thumb Solid("#eee4cf", xsize=20, ysize=34)
+                    hbox:
+                        xsize 510
+                        text "작게" size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
+                        text "크게" xalign 1.0 size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
+                    text "안내 음악" size 30 color ("#627078" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#dce2e5")
+                    if _preferences.get_mute("music") and _preferences.get_mute("sfx"):
+                        bar:
+                            value StaticValue(_preferences.get_mixer("music"), 1.0)
+                            xsize 510
+                            ysize 24
+                            left_bar Solid("#4c5b63")
+                            right_bar Solid("#29343b")
+                            thumb Solid("#69767b", xsize=20, ysize=34)
+                    else:
+                        bar:
+                            value Preference("music volume")
+                            xsize 510
+                            ysize 24
+                            left_bar Solid("#9ab3ba")
+                            right_bar Solid("#334049")
+                            thumb Solid("#eee4cf", xsize=20, ysize=34)
+                    hbox:
+                        xsize 510
+                        text "작게" size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
+                        text "크게" xalign 1.0 size 18 color ("#58666d" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "#83949c")
+                textbutton ("음소거 해제" if (_preferences.get_mute("music") and _preferences.get_mute("sfx")) else "전체 음소거") action Preference("all mute", "toggle")
+                if _preferences.get_mute("music") and _preferences.get_mute("sfx"):
+                    text "전체 음소거 적용 중" size 21 color "#829199"
                 text "인물 음성은 사용하지 않습니다.\n안내 음악을 끄고 플레이해도 됩니다." size 24 line_spacing 14 color "#9daea1"
                 if not main_menu:
                     textbutton "처음 화면으로" action MainMenu()
@@ -428,8 +459,9 @@ screen notice_page():
             text "온결   /   회복 프로그램" size 23 color "#58696e"
             text "참가자 안내" size 48 color "#293d48"
             null height 12
-            text "이곳에서는 서두르지 않아도 됩니다.\n저녁 배식은 21시 10분입니다.\n안내자는 항상 두 번 노크합니다.\n불편하신 점은 호출 버튼으로 알려 주세요.\n언제든 도와드리겠습니다.\n스스로를 탓하지 마세요." size 33 color "#2c3b44" line_spacing 21
+            text "이곳에서는 서두르지 않아도 됩니다.\n저녁 배식은 21시 10분입니다.\n안내자는 항상 두 번 노크합니다.\n불편하신 점은 호출 버튼으로 알려 주세요.\n언제든 도와드리겠습니다.\n스스로를 탓하지 마세요." size 33 color "#2c3b44" line_spacing 21 slow_cps True slow_abortable True
             textbutton "안내문에서 눈을 뗀다" id "close_notice" action Return() text_color "#465e6e" text_hover_color "#1b2e3d" xalign 1.0 text_size 24
+    key "game_menu" action ShowMenu("preferences")
 
 screen evidence_fragment():
     modal True
@@ -440,5 +472,6 @@ screen evidence_fragment():
         vbox:
             spacing 38
             text "서랍 안쪽 / 뜯긴 종이" size 21 color "#526365"
-            text "…호출을 누르고…\n상담사가 와서… 괜찮다고…\n차는 따뜻했다…\n그 뒤로 기억이…\n뭘 하고 있었더라…" font HAND size 56 color "#424e50" line_spacing 15
+            text "…호출을 누르고…\n상담사가 와서… 괜찮다고…\n차는 따뜻했다…\n그 뒤로 기억이…\n뭘 하고 있었더라…" font HAND size 56 color "#424e50" line_spacing 15 slow_cps True slow_abortable True
             textbutton "종이를 내려놓는다" id "close_fragment" action Return() text_size 26 text_color "#465e6e" text_hover_color "#1b2e3d" xalign 1.0
+    key "game_menu" action ShowMenu("preferences")

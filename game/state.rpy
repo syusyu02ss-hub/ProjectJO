@@ -8,6 +8,7 @@ default urgent_dejavu_seen = False
 default sorting_experienced = False
 default scene_sort_count = 0
 default full_sort = False
+default sort_run_id = ""
 default wrong_choice_history = {"A": 0, "B": 0, "C": 0}
 default fail_kind = "A"
 default latest_warning = ""
@@ -27,10 +28,11 @@ default returning_from_sort = False
 
 init python:
     import math
+    import uuid
     PAPER = "#eee4cf"
     INK = "#383d36"
     ACCENT = "#9ab3ba"
-    HAND = "fonts/NanumPenScript-Regular.ttf"
+    HAND = "fonts/NanumSmile.ttf"
     URGENT_NOTE = "검은 버튼. 노란 표시등.\n카메라는 카트의 태그를 본다."
     TRUST_LINE = "기억이 없다면 이 글부터 믿어. 네 글씨다."
     HINT_DEFINITIONS = {
@@ -61,6 +63,20 @@ init python:
         "참가자 0713 · 정리 누적 3회",
         "상태: 등록 요건 충족 → 정식 등록 완료"
     )
+    SORT_MONOLOGUES = {
+        "normal": (
+            "눈꺼풀이 무거워진다. 펜을 놓지 않으려고 손가락에 힘을 준다.",
+            "방금 쓴 글씨가 시야 끝에 남아 있다. 저건 다음의 내가 읽을 것이다.",
+            "그러니 잊어도 된다. 남겨 두었다."
+        ),
+        "complete": (
+            "펜을 잡으려 했다. 손이 말을 듣지 않는다.",
+            "무엇을 적으려던 참이었더라. 생각이 어디론가 흘러간다.",
+            "이상하게 편하다. 오래 애쓰던 일이 끝난 것 같다.",
+            "가슴께에 이름표가 달린다. 0713.",
+            "나는 여기에 오래 있었던 사람 같다."
+        )
+    }
     OBJECTS = [
         ("window", "창", 185, 371),
         ("cup", "찻잔", 582, 720),
@@ -93,12 +109,40 @@ init python:
         m = store.wall_minutes + (37 if wrist and store.sorting_experienced else 0)
         return "%02d:%02d" % ((m // 60) % 24, m % 60)
 
+    def begin_sort_run():
+        """새 게임마다 독립적인 정리 횟수 기록을 시작한다."""
+        store.sort_run_id = str(uuid.uuid4())
+        store.scene_sort_count = 0
+        store.full_sort = False
+        counts = dict(getattr(persistent, "scene_sort_counts", None) or {})
+        counts[store.sort_run_id] = 0
+        persistent.scene_sort_counts = counts
+        renpy.save_persistent()
+
+    def scene_sort_total():
+        """자동 저장을 불러와도 현재 게임의 정리 횟수는 되돌리지 않는다."""
+        if not store.sort_run_id:
+            store.sort_run_id = str(uuid.uuid4())
+            counts = dict(getattr(persistent, "scene_sort_counts", None) or {})
+            counts[store.sort_run_id] = store.scene_sort_count
+            persistent.scene_sort_counts = counts
+            renpy.save_persistent()
+        return (getattr(persistent, "scene_sort_counts", None) or {}).get(store.sort_run_id, store.scene_sort_count)
+
+    def set_scene_sort_total(value):
+        store.scene_sort_count = value
+        counts = dict(getattr(persistent, "scene_sort_counts", None) or {})
+        counts[store.sort_run_id] = value
+        persistent.scene_sort_counts = counts
+        renpy.save_persistent()
+
     def write_failure(kind):
         store.fail_kind = kind
         store.wrong_choice_history[kind] += 1
-        store.scene_sort_count += 1
+        total = scene_sort_total() + 1
+        set_scene_sort_total(total)
         store.sorting_experienced = True
-        store.full_sort = store.scene_sort_count >= 3
+        store.full_sort = total >= 3
 
         # 정리 횟수는 저장되며, 실패 뒤에는 선택 전으로 되돌릴 수 없다.
         renpy.block_rollback()
@@ -106,7 +150,7 @@ init python:
         if store.full_sort:
             return True
 
-        level = min(store.scene_sort_count, 2)
+        level = min(total, 2)
         hint = HINT_DEFINITIONS[kind]["warnings"][level - 1]
         store.latest_warning = "\n\n".join((hint, TRUST_LINE))
         store.warnings.append((kind, level, store.latest_warning))
@@ -116,8 +160,38 @@ init python:
         return "\n\n".join(content for _kind, _level, content in store.warnings)
 
     def reset_scene_sort_count():
-        store.scene_sort_count = 0
+        set_scene_sort_total(0)
         store.full_sort = False
+
+    def reset_scene1_state():
+        """완전 정리 뒤 장면 1을 새 게임처럼 다시 시작할 상태로 돌린다."""
+        set_scene_sort_total(0)
+        store.sort_run_id = ""
+        store.clues = []
+        store.observed = []
+        store.notes = []
+        store.warnings = []
+        store.urgent_note_written = False
+        store.first_dejavu_seen = False
+        store.urgent_dejavu_seen = False
+        store.sorting_experienced = False
+        store.full_sort = False
+        store.wrong_choice_history = {"A": 0, "B": 0, "C": 0}
+        store.fail_kind = "A"
+        store.latest_warning = ""
+        store.stage = "intro"
+        store.wall_minutes = 1258
+        store.note_focus = "observations"
+        store.skip_locked = False
+        store.chapter_complete = False
+        store.inspected = ""
+        store.call_resolved = False
+        store.clock_seconds = 0
+        store.opening_note_key = ""
+        store.opening_note_title = ""
+        store.opening_note_text = ""
+        store.opening_note_flags = ()
+        store.returning_from_sort = False
 
     def checkpoint():
         renpy.save("auto-1", extra_info="제1장 · " + ("열린 문" if store.stage == "judgment" else "호출 버튼"))
