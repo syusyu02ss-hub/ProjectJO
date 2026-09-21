@@ -25,6 +25,7 @@ label start:
     hide screen room_clock
     scene black
     show screen memory_portrait("neutral", speaking=False)
+    "조금 전, 온결 로비."
     "몇 달 전, 우연히 알게 된 사람. 이직 이야기가 번번이 틀어졌을 때도 서아는 내 말을 끝까지 들어줬다."
     show screen memory_portrait("neutral", speaking=True)
     seoa "긴장한 얼굴이네. 여기 사람들 다 좋아, 진짜."

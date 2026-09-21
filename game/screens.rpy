@@ -18,6 +18,19 @@ init -2:
         hover_background Solid("#9ab3ba55")
     style main_menu_button_text is button_text:
         xalign 0.5
+    style menu_text is default:
+        font "fonts/NanumMyeongjo.ttf"
+        kerning 1.0
+        outlines [(1, "#0710192b", 0, 1)]
+    style menu_title is menu_text:
+        kerning 1.6
+    style menu_button is button:
+        background Solid("#ffffff08")
+        hover_background Solid("#9ab3ba25")
+    style menu_button_text is button_text:
+        font "fonts/NanumMyeongjo.ttf"
+        kerning 1.0
+        outlines [(1, "#0710192b", 0, 1)]
     style frame:
         background Solid("#101820f5")
         padding (45, 39)
@@ -53,9 +66,11 @@ screen room_clock():
     add Solid("#8fa99a") xpos 926 ypos 237 xsize 87 ysize 5
 
 screen say(who, what):
+    # 한 장의 연속 알파 그라데이션으로 로비와 이어지되, 하단에서는 글자를 읽을 수 있게 한다.
+    add Transform("images/dialogue_gradient.png", xysize=(config.screen_width, 303)) xpos 0 ypos (config.screen_height - 303)
     window:
         id "window"
-        background Solid("#0b121af5")
+        background None
         xfill True
         yalign 1.0
         ysize 303
@@ -63,6 +78,7 @@ screen say(who, what):
         if who:
             text who id "who" size 26 color ACCENT ypos 0
         text what id "what" ypos (48 if who else 26) xsize 1620 size 36 line_spacing 15
+    add Solid("#a1b9bf75") xpos 0 ypos (config.screen_height - 303) xsize config.screen_width ysize 1
     key "game_menu" action ShowMenu("pause_menu")
 
 define diary_reader = Character(None, screen="diary_reading")
@@ -97,16 +113,29 @@ screen diary_reading(who, what):
 
 screen main_menu():
     tag menu
-    add Transform("images/room_cold.png", xysize=(1920,1080), matrixcolor=SaturationMatrix(.35) * BrightnessMatrix(-.32))
-    add Solid("#0710199c")
-    vbox:
-        xalign .5 ypos 135 spacing 38
-        text "평온의 방" xalign .5 size 68 color "#e1e8ed"
-        null height 120
-        textbutton "시작하기" id "start_game" action Start() style "main_menu_button" xsize 510
-        textbutton "불러오기" id "load_game" action ShowMenu("load") style "main_menu_button" xsize 510
-        textbutton "설정" id "preferences" action ShowMenu("preferences") style "main_menu_button" xsize 510
-        textbutton "종료" id "quit_game" action Quit(confirm=False) style "main_menu_button" xsize 510
+    add Transform("images/menu_corridor.png", xysize=(1920,1080))
+    add Solid("#07101952")
+    add Transform("images/title_logo.png", xysize=(960,320), alpha=.92) xpos 480 ypos 105
+    default hovered_menu_item = ""
+    fixed:
+        xalign .5 ypos 500 xsize 510 ysize 430
+        for item_id, label, menu_action, item_ypos in (
+            ("start_game", "시작하기", Start(), 0),
+            ("load_game", "불러오기", ShowMenu("load"), 120),
+            ("preferences", "설정", ShowMenu("preferences"), 240),
+            ("quit_game", "종료", Quit(confirm=False), 360),
+        ):
+            button:
+                id item_id
+                ypos item_ypos
+                xfill True ysize 70 padding (0, 0)
+                background None
+                hover_background None
+                action menu_action
+                hovered SetScreenVariable("hovered_menu_item", item_id)
+                unhovered SetScreenVariable("hovered_menu_item", "")
+                fixed:
+                    text ("{b}" + label + "{/b}" if hovered_menu_item == item_id else label) xalign .5 yalign .45 size (38 if hovered_menu_item == item_id else 33) color ("#e4eceb" if hovered_menu_item == item_id else "#aebbbb") font "fonts/NanumMyeongjo.ttf" kerning 1.0 outlines [(1, "#0710192b", 0, 1)]
 
 label main_menu:
     call screen main_menu
@@ -289,6 +318,7 @@ screen end_chapter():
     key "game_menu" action ShowMenu("pause_menu")
 
 screen menu_tabs():
+    style_prefix "menu"
     hbox:
         spacing 16
         if not main_menu:
@@ -301,8 +331,9 @@ screen menu_tabs():
             textbutton "인물" action ShowMenu("characters") text_size 25
 
 screen menu_shell(title):
+    style_prefix "menu"
     add Solid("#0f1e1df7")
-    text title xpos 117 ypos 65 size 53
+    text title xpos 117 ypos 65 size 53 style "menu_title"
     textbutton ("돌아가기" if main_menu else "계속하기") id "menu_back" xpos 1605 ypos 65 action Return() text_size 27
     fixed:
         xpos 117 ypos 139 xsize 1550 ysize 70
@@ -329,6 +360,7 @@ screen notebook_menu():
 
 screen characters():
     tag menu
+    style_prefix "menu"
     default selected_person = "suhyeok"
     use menu_shell("인물"):
         vbox:
@@ -349,20 +381,21 @@ screen characters():
         vbox:
             xpos 1190 ypos 330 xsize 590 spacing 35
             if selected_person == "suhyeok":
-                text "김수혁" size 46
+                text "김수혁" size 46 style "menu_title"
                 text "참가 번호 0713" size 27 color ACCENT
                 text "뭐든 적어 두는 사람.\n적어 두지 않으면 불안하다." size 30 line_spacing 18
             elif selected_person == "seoa":
-                text "윤서아" size 46
+                text "윤서아" size 46 style "menu_title"
                 text "내 말을 끝까지 들어주던 사람." size 30
                 text "온결의 회복 프로그램을 소개해 주었다." size 28
             else:
-                text "기록 속 인물 · 0611" size 42
+                text "기록 속 인물 · 0611" size 42 style "menu_title"
                 text "이름과 얼굴은 아직 모른다." size 29 color ACCENT
                 text "서랍 안쪽에 일기를 남겼다.\n호출 뒤의 기억이 없다고 적었다." size 28 line_spacing 18
 
 screen preferences():
     tag menu
+    style_prefix "menu"
     use menu_shell("환경 설정"):
         viewport:
             xpos 128 ypos 239 xsize 1650 ysize 790
@@ -517,24 +550,14 @@ screen skip_indicator():
     text "읽은 문장 넘기는 중" xpos 1545 ypos 33 size 23 color ACCENT
 
 screen memory_portrait(expression, speaking=False):
-    # 수혁은 화면에 보이지 않는다. 서아의 상반신만 대사창 위에 두고,
-    # 수혁의 차례에는 서아를 듣는 쪽으로 어둡게 처리한다.
-    add Solid("#101820")
-    add Solid("#75838d") xpos 1067 ypos 47 xsize 672 ysize 729
+    # 대사창 뒤에 로비와 상반신을 배치한다. 수혁의 차례에는 약한 음영만 준다.
+    zorder -1
+    add Transform("images/lobby_day.png", xysize=(1920, 1080), matrixcolor=SaturationMatrix(.65))
     add Transform(
-        "images/seoa_cutout_" + expression + ".png",
-        crop=(0, 0, 1122, 1200),
-        xysize=(666, 723),
-        matrixcolor=(TintMatrix("#b9c5cf") * BrightnessMatrix(-.13) if speaking else SaturationMatrix(.18) * BrightnessMatrix(-.46))
-    ) xpos 1070 ypos 50
-    if not speaking:
-        add Solid("#06101870") xpos 1070 ypos 50 xsize 666 ysize 723
-    vbox:
-        xpos 165 ypos 222 spacing 33
-        text "조금 전, 로비" size 23 color "#879fae"
-        text "잘 다녀와." font HAND size 87 color "#c0cdd6"
-        null height 18
-        text "내 말을 끝까지 들어주던 사람." size 26 color "#95a6b2"
+        "images/seoa_lobby_" + expression + ".png",
+        xysize=(500, 646),
+        matrixcolor=(SaturationMatrix(.8) if speaking else SaturationMatrix(.6) * BrightnessMatrix(-.12))
+    ) xpos 1280 ypos 224
 
 screen threshold_still():
     # 열린 문을 세밀하게 움직이는 대신, 가까워진 시야의 정지 화면.
