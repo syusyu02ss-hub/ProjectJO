@@ -1,356 +1,253 @@
-# 장면 1. 마지막 승인 원고와 수정 사항이 초기 기획서보다 우선한다.
+# 장면 1 · 새 설계 전환
+# 방 탐색 → 정전 → 열린 문 → 복도 데모로 연결.
+
 define su = Character("나", color="#a9bac2")
-define seoa = Character("윤서아", color="#acbdc1")
-define staff = Character("직원", color="#a9b4b8")
-define guide = Character("안내자", color="#b9c4c8")
+define seo = Character("윤서아", color="#d3bcc0")
 
 image room = Transform("images/room_cold.png", xysize=(1920, 1080))
 image black = Solid("#070b10")
-image room_after = Transform("images/room_cold.png", xysize=(1920, 1080), matrixcolor=SaturationMatrix(.2) * BrightnessMatrix(.14))
+image room_after = Transform(
+    "images/room_cold.png",
+    xysize=(1920, 1080),
+    matrixcolor=SaturationMatrix(.16) * BrightnessMatrix(-.42)
+)
 
 label start:
-    $ begin_sort_run()
-    $ set_skip_lock(False)
+    $ reset_scene1_state()
+    $ stage = "lobby"
+
+    # 로비는 현재의 서아를 보여 주는 짧은 프롤로그다.
+    # 이후 연구소 안에서는 별도의 인물 세트를 사용한다.
+    show screen memory_portrait(None)
+    "조금 전, 온결 로비."
+    "햇빛이 로비 바닥에 길게 드리워져 있다. 그 끝에서 서아가 돌아본다."
+    "처음 만난 날에도 저렇게 소매를 걷고 있었다. 봉사활동이 끝나고, 둘이 남아 물품 상자를 정리하던 날."
+    "잘하던 일이 손에 잡히지 않아 쉬기로 했었다. 막상 집에 있으니 못 끝낸 일만 자꾸 생각났다."
+    "봉사활동은 밖에 나갈 핑계였다."
+    "상자를 나르는 동안에는 눈앞의 일만 하면 됐다. 다음 주에도 나오겠다고, 어느새 내가 먼저 말하고 있었다."
+    "서아와는 자주 같은 일을 맡았다. 처음에는 잘 웃는 사람이라고만 생각했다."
+    "웃음을 참다가 눈가부터 풀리는 표정이 좋았다. 그걸 보려고 괜히 말을 건 적도 있다."
+    "한번은 일이 잘 안 풀린다는 얘기까지 꺼냈다. 서아는 상자를 내려놓고 내 옆에 앉았다."
+    "말이 끊겨도 재촉하지 않았다. 덕분에 생각보다 많은 얘기를 했다."
+    "그 뒤로는 토요일에 눈을 뜨는 일이 조금 수월해졌다."
+
+    show screen memory_portrait("soft", speaking=True)
+    seo "많이 긴장했어?"
+
+    show screen memory_portrait("neutral", speaking=False)
+    "휴대폰을 도로 주머니에 넣는다. 아까 봤을 때랑 겨우 일 분 차이다."
+    su "조금. 이런 데는 처음이라."
+    su "막상 오니까 무슨 말을 해야 할지도 모르겠고."
+
+    show screen memory_portrait("warm", speaking=True)
+    seo "그냥 방금 나한테 한 얘기부터 해 봐."
+
+    show screen memory_portrait("neutral", speaking=False)
+    "서아가 웃는다. 나도 따라 웃고 나니 조금 낫다."
+    "이 프로그램을 권한 것도 서아였다. 지나가듯 말한 잠 얘기를 기억해 줬다."
+    su "이거 끝나면 좀 나아지려나."
+
+    show screen memory_portrait("soft", speaking=True)
+    seo "조금이라도 편해졌으면 좋겠어."
+
+    show screen memory_portrait("neutral", speaking=False)
+    "고개를 끄덕인다. 이 애 앞에서는 괜찮은 척하지 않아도 된다."
+    su "다녀올게. 오래 걸리면 먼저 가도 돼."
+
+    show screen memory_portrait("soft", speaking=True)
+    seo "괜찮아. 여기서 기다릴게."
+
+    show screen memory_portrait("soft", speaking=False)
+    "돌아보니 서아가 손을 흔든다. 나도 작게 흔들어 준다."
+
+    hide screen memory_portrait
     $ stage = "intro"
     scene room
-    show screen room_clock
-    play music "audio/guide_music.wav" fadein 2.0
-    "문이 닫혔다. 잠기는 소리는 없었다. 조용히 닫히는 문이었다."
-    "방은 나쁘지 않았다. 소파, 찻잔, 벽시계. 호텔방 같기도 하고 상담실 같기도 했다."
-    "다만 빛이 조금 부족했다. 천장의 흰 조명 아래, 가구의 윤곽만 서늘하게 남아 있었다."
-    "휴대폰은 접수 데스크에 맡겼다. 대신 받은 건 수첩 한 권과 펜 한 자루."
-    "나는 원래 뭐든 적어 두는 사람이다. 적어 두지 않으면 불안하다. 이런 곳에서는 더 그렇다."
-    "수첩을 펼치자 첫 장에 참가 번호 스티커가 붙어 있다. 0713."
-    "로비에서 서아가 했던 말이 떠올랐다."
-    hide screen room_clock
-    scene black
-    show screen memory_portrait("neutral", speaking=False)
-    "조금 전, 온결 로비."
-    "몇 달 전, 우연히 알게 된 사람. 이직 이야기가 번번이 틀어졌을 때도 서아는 내 말을 끝까지 들어줬다."
-    show screen memory_portrait("neutral", speaking=True)
-    seoa "긴장한 얼굴이네. 여기 사람들 다 좋아, 진짜."
-    show screen memory_portrait("neutral", speaking=False)
-    su "너는 자주 와?"
-    show screen memory_portrait("soft", speaking=True)
-    seoa "일 때문에 종종. 그리고… 전에도 도와준 사람이 있었어. 다들 잘 지내."
-    "자랑하는 웃음이 아니었다. 좋은 소식을 전하는 사람의 웃음이었다."
-    "온결의 사원 추천형 회복 프로그램. 직원인 서아는 외부인도 추천할 수 있다고 했다."
-    show screen memory_portrait("warm", speaking=True)
-    seoa "나는 여기까지야. 거기 가면 다 괜찮아질 거야."
-    show screen memory_portrait("warm", speaking=False)
-    su "끝나고 연락할게."
-    show screen memory_portrait("warm", speaking=True)
-    seoa "응. 잘 다녀와."
-    hide screen memory_portrait
-    play sound "audio/door_close.wav"
-    scene room
-    show screen room_clock
-    "문이 닫힌다. 나는 방 안에 남았다."
-    call record_note("seoa", "로비에서", "서아: 전에도 도와준 사람이 있었어. 다들 잘 지내.", ("seoa_line",))
-    "왜 이걸 적었을까. 습관이다. 아직은."
-    jump investigate
 
-# 수첩의 모든 관찰은 작성 화면을 거친 다음에만 추가한다.
-label record_note(key, title, content, flags=()):
-    if not any(n[0] == key for n in notes):
-        play foley "audio/pen.wav"
-        call screen handwritten(content, title)
-        $ add_note(key, title, content, flags)
-    return
+    "눈부셔."
+    "눈을 가늘게 뜬다. 흐릿한 조명이 천천히 모양을 잡는다."
+    "등이 배긴다. 몸을 뒤척이자 차가운 소파에 맨팔이 닿는다."
+    "잠깐, 여기가 어디야."
+    "낯선 탁자, 식은 찻잔. 맞은편에는 문이 닫혀 있다."
+    "일어나려는데 머리가 욱신거린다."
+    "온결. 프로그램 받으러 왔었지."
+    "서아랑 얘기하고 접수하러 갔는데."
+    "얼마나 잔 거지. 서아가 기다리고 있을 텐데."
+    "주머니에 손을 넣는다. 비어 있다."
+    "반대쪽에도 없다."
+    "떨어졌나."
+    "소파 틈을 뒤지고 아래도 들여다본다. 먼지만 손에 묻어난다."
+    "로비에서 시간까지 확인했잖아."
+    su "...젠장."
+    "문으로 다가가 손잡이를 내린다."
+    play sound "audio/handle.wav"
+    "철컥. 안 열린다."
+    "당기는 건가?"
+    "어깨를 대고 밀어도 꼼짝없다."
+    "귀를 대 본다. 내 숨소리뿐이다."
+    "휴대폰도 없고 문도 안 열린다."
+    "왜 잠가 놨지?"
+    "다른 데를 보자. 나갈 방법이 있을 거야."
+
+    jump investigate
 
 label investigate:
     $ stage = "investigation"
     window hide
     call screen investigation
     $ inspected = _return
-    if inspected == "notice":
-        call inspect_notice
-    elif inspected == "drawer":
-        call inspect_drawer
-    elif inspected == "light":
-        call inspect_light
-    elif inspected == "door":
-        call inspect_door
+
+    if inspected == "window":
+        call inspect_window
     elif inspected == "cup":
         call inspect_cup
-    elif inspected == "window":
-        call inspect_window
     elif inspected == "clock":
         call inspect_clock
-    elif inspected == "call":
-        call inspect_call
+    elif inspected == "door":
+        call inspect_door
+    elif inspected == "light":
+        call inspect_light
+    elif inspected == "panel":
+        call inspect_panel
+    elif inspected == "button":
+        call inspect_button
+    elif inspected == "drawer":
+        call inspect_drawer
+
     if investigation_ready():
-        jump delivery
+        jump blackout
     jump investigate
 
-label inspect_notice:
-    "문 옆 액자에 안내문이 걸려 있다."
-    call screen notice_page
-    "문장은 하나같이 친절하다. 그런데 나가는 방법은 어디에도 없다."
-    call record_note("notice", "안내문", "배식 21:10 / 안내자는 두 번 노크\n불편하면 호출 버튼", ("meal_2110", "rule_knock", "call_button_rule"))
-    $ mark_observed("notice")
+label inspect_window:
+    "유리에 얼굴을 가까이 댄다. 밖은 뿌옇기만 하다."
+    "손잡이가 없다. 테두리를 더듬어도 벌어지는 틈 하나 없다."
+    "밀어 봐도 소용없다."
+    "창문 맞아, 이거?"
+    $ add_record("window", "창", "바깥이 보이지 않는다. 열리지 않는다.")
+    $ mark_observed("window")
+    return
+
+label inspect_cup:
+    "잔이 차갑다."
+    "목이 마르다. 한 모금만 마셨으면."
+    "누가 놓고 간 거지. 내가 마셨던 건가."
+    "그냥 내려놓는다. 달그락, 작은 소리에도 흠칫한다."
+    $ add_record("cup", "찻잔", "언제 놓였는지 알 수 없는 식은 차.")
+    $ mark_observed("cup")
+    return
+
+label inspect_clock:
+    "초침이 멎어 있다."
+    "하나, 둘, 셋."
+    "움직이지 않는다."
+    "얼마나 잔 건지 이것마저 못 알려 주네."
+    $ add_record("clock", "벽시계", "초침이 멎어 있다. 시간을 알 수 없다.")
+    $ mark_observed("clock")
     return
 
 label inspect_door:
-    "안쪽에는 손잡이뿐이다. 열쇠구멍도 잠금장치도 없다."
+    "잠금을 푸는 게 어디 있지?"
     play sound "audio/handle.wav"
-    "손잡이는 돌아간다. 그런데 문은 밀리지 않는다. 잠겨 있다기보다, 열리지 않기로 되어 있는 문 같다."
-    call record_note("door", "문", "손잡이는 돌아가지만 문은 안 열림")
+    "손잡이를 끝까지 내리고 당긴다. 문틀만 삐걱거린다."
+    "안에서 여는 게 있어야 하잖아."
+    "문 아래까지 살펴도 걸쇠 하나 없다."
+    $ add_record("door", "문", "손잡이는 움직이지만 문은 열리지 않는다.")
     $ mark_observed("door")
     return
 
 label inspect_light:
-    "문 위에 손톱만 한 표시등이 있다. 초록색이다. 문의 상태를 알려 주는 것 같다."
-    "그렇다면 이 방에서 문 상태를 아는 건 내가 아니라 문 쪽이다."
-    call record_note("light", "문 위", "문 위 표시등: 지금은 초록", ("light_green",))
+    "문 위에 작은 패널이 있다. 아무 표시도 없다."
+    "고장 난 건가?"
+    "손잡이를 움직여 봐도 불은 들어오지 않는다."
+    $ add_record("light", "문 위 패널", "검은 패널. 표시가 없다.")
     $ mark_observed("light")
+    return
+
+label inspect_panel:
+    "안내문인가 싶어 다가간다."
+    "빈 액자다."
+    "연락처라도 좀 적어 놓지. 여기가 어딘지도 모르겠는데."
+    $ add_record("panel", "빈 액자", "글자 없는 액자. 안내문은 없다.")
+    $ mark_observed("panel")
+    return
+
+label inspect_button:
+    "이걸 누르면 열리나?"
+    "버튼에는 글자도 화살표도 없다."
+    "누군가를 부르는 거면 어떡하지."
+    "이 문을 잠근 사람이 오면?"
+    "뻗던 손을 거둔다. 이건 누르지 말자."
+    $ add_record("button", "벽 버튼", "용도를 알 수 없는 버튼. 누르지 않았다.")
+    $ mark_observed("button")
     return
 
 label inspect_drawer:
     play sound "audio/drawer.wav"
-    "첫 서랍에는 같은 표지의 새 수첩과 펜, 티슈가 들어 있다."
-    "두 번째 서랍은 뻑뻑하다. 안쪽이 바깥에서 본 깊이보다 얕다."
-    window hide
-    call screen drawer_search
-    window show
-    "손끝으로 안쪽을 더듬자, 얇은 틈에 납작한 수첩 하나가 걸린다."
-    "표지는 손때로 검고, 첫 장에는 같은 사람이 며칠에 걸쳐 적은 글이 남아 있다."
-    window hide
-    diary_reader "[DRAWER_DIARY_PAGES[0]]"
-    diary_reader "[DRAWER_DIARY_PAGES[1]]"
-    window show
-    "[DRAWER_DIARY_MONOLOGUES[0]]"
-    "[DRAWER_DIARY_MONOLOGUES[1]]"
-    "일기 옆에는 이름표를 붙였다 떼어 낸 자리만 남아 있다."
-    call record_note("drawer", "이전 사람의 일기", DRAWER_DIARY_NOTE, ("drawer_marks", "name_tag_erased", "diary_found", "diary_number"))
+    "덜컥. 나도 모르게 문 쪽을 돌아본다."
+    "조용하다. 다시 서랍 안을 들여다본다."
+    "빈칸. 그 아래도 빈칸."
+    "안쪽까지 손을 넣어 본다. 휴대폰은커녕 종이 한 장 없다."
+    $ add_record("drawer", "서랍장", "비어 있다. 개인 물건도, 쓸 도구도 없다.")
     $ mark_observed("drawer")
-    # 마지막 필수 조사여도 함정 조사 기회를 잃지 않도록 한 번 연결한다.
-    if not call_resolved:
-        "문 옆의 호출 버튼이 눈에 들어온다. 방금 읽은 일기가 마음에 걸린다."
-        call inspect_call
     return
 
-label inspect_cup:
-    "김이 오른다. 들어온 뒤 아무도 차를 가져오지 않았다."
-    "내가 올 시간에 맞춰 누군가 미리 부어 둔 것이다. 입에 대지 않고 내려놓는다."
-    play sound "audio/cup.wav"
-    call record_note("cup", "찻잔", "차는 내가 오기 전부터 준비돼 있었음")
-    $ mark_observed("cup")
-    return
-
-label inspect_window:
-    "빛은 들어오는데 바깥은 젖은 유리 너머처럼 흐릿하다. 만져 보니 차갑지 않고 미지근하다."
-    "창이라기보다 창 모양의 조명이다. 낮인지 밤인지 알 방법이 없다. 시계만 시간을 알려 준다."
-    call record_note("window", "창", "창은 열리지 않음. 시간은 시계로만 안다")
-    $ mark_observed("window")
-    return
-
-label inspect_clock:
-    if not sorting_experienced:
-        "벽시계는 20시 58분이다. 손목시계도 20시 58분이다. 초침 위치까지 같다."
-        "이게 무슨 의미인지는 모르겠지만 적어 둔다."
-        call record_note("clock", "두 시계", "벽시계 = 손목시계 (20:58)", ("clock_same",))
-    else:
-        "벽시계보다 손목시계가 삼십칠 분 앞서 있다. 내 기억 밖에서 시간이 흘렀다."
-        call record_note("clock_after", "어긋난 시간", "벽시계보다 손목시계가 37분 빠름. 시간이 되돌아간 게 아님.")
-    $ mark_observed("clock")
-    return
-
-label inspect_call:
-    if not has("drawer_marks"):
-        "문 옆의 동그란 버튼. 안내문에는 눌러도 된다고 적혀 있다. 그런데 손끝이 멈춘다."
-        "이유는 모르겠다. 일단 다른 곳부터 본다."
-        return
-    "호출 버튼이 은은하게 빛난다. 누르면 부드러운 알림음이 날 것 같다."
-    $ stage = "call"
+label blackout:
+    $ stage = "blackout"
     $ checkpoint()
-    label call_decision:
-        window hide
-        call screen call_options
-        if _return:
-            $ fail_kind = "A"
-            call failure
-            call restore_after_sort
-            jump call_decision
-    "손을 뗀다. 다음에는 망설이지 않도록 적어 둔다."
-    call record_note("call_warning", "호출 버튼", "호출 버튼: 누르지 않기")
-    $ call_resolved = True
-    $ mark_observed("call")
-    $ stage = "investigation"
-    return
+    "더 볼 곳이 없다. 결국 다시 문 앞이다."
+    "자꾸 주머니로 손이 간다. 없다고. 아까 확인했잖아."
 
-label delivery:
-    $ stage = "delivery"
-    $ wall_minutes = 1269
-    stop music fadeout 1.0
-    "벽시계가 21시 9분 50초를 지난다. 방 안에는 초침 소리뿐이다."
-    label replay_delivery:
-        $ stage = "delivery"
-        play sound "audio/knock_two.wav"
-        "똑, 똑."
-        "두 번. 안내문 그대로다."
-        play sound "audio/door_open.wav"
-        $ wall_minutes = 1270
-        # 직원과 카트는 지문과 소리로만 존재한다. 화면은 정지된 시야로 바뀐다.
-        hide screen room_clock
-        show screen threshold_still
-        "문이 열린다. 온결 유니폼을 입은 젊은 직원이 은색 태그가 붙은 배식 카트를 밀고 서 있다. 표정이 평온하다."
-        "그는 문 옆 패널에 손을 뻗어 오른쪽 아래의 검은 버튼을 누른다."
-        play sound "audio/panel.wav"
-        "문 위 표시등이 노랗게 바뀐다. 문은 열린 채 닫히지 않는다."
-        "복도 천장의 작은 카메라가 카트 쪽으로 천천히 돈다. 렌즈는 사람이 아니라 카트의 태그에서 멈춘다."
-        staff "저녁 드세요. 불편하신 점 없으시죠?"
-        play sound "audio/cutlery.wav"
-        "그는 쟁반을 들고 탁자 쪽으로 돌아선다. 카트는 문틈에 걸린 채 남아 있다."
-        if not urgent_note_written:
-            "직원이 등을 돌렸다. 지금밖에 없다."
-            "펜 소리가 날까 봐 힘을 뺀다. 컵과 숟가락 부딪히는 소리가 이어진다. 보이는 것만 짧게 적는다."
-            call record_note("urgent", "직원의 등 뒤에서", URGENT_NOTE, ("black_button", "camera_cart"))
-            $ urgent_note_written = True
-            "글씨가 엉망이지만 알아볼 수는 있다."
-        else:
-            "수첩에 적힌 그대로였다. 검은 버튼, 노란 표시등."
-    label judgment_decision:
-        $ stage = "judgment"
-        $ stop_fast_skip()
-        $ checkpoint()
-        window hide
-        play ambience "audio/ticking.wav" fadein .2
-        call screen judgment
-        stop ambience fadeout .2
-        if _return != "success":
-            $ fail_kind = _return
-            call failure
-            call restore_after_sort
-            if _return == "judgment":
-                jump judgment_decision
-            jump replay_delivery
-    jump escape_room
+    stop music fadeout .2
+    play sound "audio/panel.wav"
+    scene black
+    "딱."
+    "불이 꺼졌다."
+    "몸이 굳는다. 눈앞에 하얀 잔상만 어른거린다."
+    "웅웅거리던 소리마저 끊겼다."
+    "왜 꺼졌지."
 
-label failure:
-    $ stage = "failure"
-    $ stop_fast_skip()
-    if fail_kind == "A":
-        play sound "audio/call.wav"
-        "부드러운 알림음이 울린다. 딩. 기분 좋을 만큼 작은 소리다."
-        play foley "audio/knock_two.wav"
-        "대답하듯 곧바로 노크가 온다. 두 번. 너무 빠르다."
-        "안내자의 손에는 이미 ‘호출 접수’라고 뜬 태블릿이 들려 있다."
-    elif fail_kind == "B":
-        su "저기, 여기서 나가고 싶어요."
-        "직원은 놀라지 않는다. 오히려 안심한 표정이다."
-        staff "아, 힘드셨구나."
-        "그의 손은 벌써 허리춤의 작은 단말로 가 있다."
-        play sound "audio/panel.wav"
-    else:
-        staff "어디 가세요?"
-        "직원은 뛰지 않는다. 뛸 필요가 없다는 듯이."
-        "복도 끝에서 같은 유니폼 두 사람이 서두르지 않고 걸어온다."
-        "나는 그들 사이로 다시 방에 들어온다. 문은 조용히 닫힌다."
-    $ full_sort = write_failure(fail_kind)
-    if full_sort:
-        jump complete_sort
-    hide screen threshold_still
-    scene room
-    show screen room_clock
-    play sound "audio/door_close.wav"
-    stop music fadeout .5
-    "안내자가 소파에 앉는다. 식은 찻잔을 치우고 새 잔을 내려놓는다. 김이 오른다."
-    guide "많이 놀라셨죠. 괜찮아요. 아무도 화 안 났어요."
-    guide "떠오르는 생각을 적어 보세요. 감정을 기록하면 편안해지거든요. 수첩은 가지고 계셔도 됩니다."
-    "서랍에 눌려 있던 글씨. ‘그 뒤로 기억이…’"
-    "지금 일을 잊게 된다면. 다음의 나에게 남겨야 한다."
-    "[SORT_MONOLOGUES['normal'][0]]"
-    play foley "audio/pen.wav"
-    call screen handwritten(latest_warning, "다음의 나에게", reveal=True, urgent=(scene_sort_count == 2))
-    "[SORT_MONOLOGUES['normal'][1]]"
-    "[SORT_MONOLOGUES['normal'][2]]"
-    hide screen room_clock
+    play sound "audio/door_open.wav"
+    "문 쪽에서 철컥, 소리가 난다."
+
     scene room_after
-    "조명이 흰색으로 바뀐다. 눈이 저절로 감긴다. 손목에 따뜻한 손이 얹힌다. 저릿하다."
-    guide "천천히 내려놓으세요. 방금 있었던 일도, 오늘 있었던 일도."
-    scene black
-    "멀리서, 다정한 말이 들린다."
-    guide "이제 괜찮아요. 잘하고 계세요."
-    stop ambience
-    window hide
-    call screen sorting_card(full_sort, fail_kind)
-    return
+    "어둠에 익숙해지자 문 윤곽이 겨우 보인다."
+    "손을 뻗어 손잡이를 찾는다."
+    play sound "audio/handle.wav"
+    "이번에도 안 열리면."
+    play sound "audio/door_open.wav"
+    "당기던 문이 움직인다."
+    "열렸다."
+    "닫히지 않게 잡고 있어야 해."
 
-label complete_sort:
-    # 완전 정리는 수첩이나 일반 정리의 복귀 연출을 거치지 않는다.
-    hide screen threshold_still
-    hide screen room_clock
-    stop music fadeout .5
-    scene room_after
-    with Dissolve(.2)
-    "[SORT_MONOLOGUES['complete'][0]]"
-    "[SORT_MONOLOGUES['complete'][1]]"
-    "[SORT_MONOLOGUES['complete'][2]]"
-    "[SORT_MONOLOGUES['complete'][3]]"
-    "[SORT_MONOLOGUES['complete'][4]]"
-    scene black
-    window hide
-    call screen sorting_card(True, fail_kind)
-    scene black
-    pause .5
-    $ reset_scene1_state()
-    $ set_skip_lock(False)
-    jump start
+    jump leave_room
 
-label restore_after_sort:
-    scene room
-    $ wall_minutes = 1258 if fail_kind == "A" else 1269
-    $ stage = "call" if fail_kind == "A" else "delivery"
-    show screen room_clock
-    "눈을 뜬다. 손에 펜이 쥐어져 있다. 무엇을 하려던 참이었지."
-    if not first_dejavu_seen:
-        $ set_skip_lock(True)
-        "천장의 흰빛이 눈에 남아 있다. 호출 버튼 쪽을 보자 작은 알림음이 귓가에 맴도는 것 같다. 손목이 저릿하다."
-        if has("clock_same"):
-            "두 시계가 같다고 적어 두었다. 그런데 지금은 손목시계가 삼십칠 분 앞서 있다."
-        else:
-            "손목시계가 벽시계보다 삼십칠 분 앞서 있다. 기억하지 못하는 시간이 있다."
-        "벽시계는 되돌려 맞춰 둔 모양이다. 내 손목에서 흐른 시간까지 돌려놓지는 못했다."
-        $ set_skip_lock(False)
-    if urgent_note_written:
-        if not urgent_dejavu_seen:
-            $ set_skip_lock(True)
-        "급하게 쓴 글씨다. 내 글씨인데 쓴 기억이 없다."
-        call screen handwritten(URGENT_NOTE, "이미 적혀 있는 글씨", reveal=False)
-        $ urgent_dejavu_seen = True
-        $ set_skip_lock(False)
-    "그 아래, 접힌 페이지에 다른 글이 있다."
-    call screen handwritten(warning_page_text(), "쓴 기억이 없는 내 글씨", reveal=False)
-    "기억은 없지만 글씨는 남았다. 지금은 이 글을 믿어야 한다."
-    $ first_dejavu_seen = True
-    if fail_kind == "A":
-        "서랍을 다시 본다. 눌린 자국은 그대로다. 호출 버튼에서 손을 뗐다가, 잠시 멈춘다."
-        $ checkpoint()
+label leave_room:
+    $ stage = "corridor"
+    scene black
+    show screen opened_door
+    with Dissolve(.6)
+    "문틈으로 찬 공기가 밀려온다."
+    "밖은 더 어둡다. 문턱을 넘으려다 멈춘다."
+    play ambience "audio/corridor.wav" fadein .4
+    "바닥만 희미하게 보인다. 복도 끝은 보이지 않는다."
+    "귀를 기울여도 조용하다."
+    "여기로 나가도 되는 걸까."
+    window hide
+    call screen door_choices
+
+    if _return == "stay":
+        "한 발 물러선다. 조금만 기다려 볼까."
+        "문이 따라 닫히려 하자 얼른 붙잡는다."
+        "아니야."
+        "다시 잠기면 어떡하려고."
+        "휴대폰도 없는데 여기 앉아서 뭘 기다려."
+        "열렸을 때 나가자."
     else:
-        "벽시계는 21시 9분 50초를 가리킨다. 나는 수첩을 펼친 채 문을 본다."
-    return
+        "기다리는 건 그만하자."
+        "그냥 프로그램이면, 방에서 나갔다고 뭐라고 하진 않겠지."
+        "그래. 잘못한 것도 없잖아."
 
-label escape_room:
-    $ stage = "escape"
-    "숨을 죽이고 몸을 낮춘다. 카트의 은색 태그가 복도 불빛을 받아 반짝인다. 카메라는 여전히 카트만 보고 있다."
-    "카트 뒤, 한 뼘 남짓한 그림자 안으로 발을 옮긴다."
-    play sound "audio/cutlery.wav"
-    "컵과 숟가락 부딪히는 소리. 한 걸음. 두 걸음. 그는 끝까지 뒤돌아보지 않는다."
-    hide screen threshold_still
-    scene black
-    stop ambience fadeout .5
-    play ambience "audio/corridor.wav" fadein .5
-    "문틀을 넘는다. 복도의 공기는 방보다 차갑다. 그 차가움이 이상하게 반갑다."
-    "왼쪽 비품실 문이 조금 열려 있다. 몸을 밀어 넣고 문을 닫는다. 어둠."
-    play sound "audio/door_close.wav"
-    "수첩에 짧게 적는다. 손끝의 떨림이 조금 가라앉았다."
-    call record_note("escape", "문 하나를 지나서", "방을 나옴. 카트 뒤로.")
-    "그때, 벽 너머에서 소리가 들린다."
-    play sound "audio/knock_signal.wav"
-    "톡. 톡톡."
-    $ chapter_complete = True
-    $ stage = "complete"
-    window hide
-    call screen end_chapter
-    return
+    "문을 조금 더 당겨 틈으로 빠져나간다."
+    "손잡이 대신 벽을 짚는다. 여기서 나가자."
+
+    jump corridor_demo

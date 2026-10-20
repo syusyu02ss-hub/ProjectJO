@@ -3,7 +3,7 @@ define config.version = "0.2.0"
 define config.window_title = "평온의 방"
 define config.screen_width = 1920
 define config.screen_height = 1080
-define config.save_directory = "PyeongonuiBang-2026"
+define config.save_directory = "PyeongonuiBang-2026" if config.developer else "PyeongonuiBang-Demo-0.2.0"
 define config.has_sound = True
 define config.has_music = True
 define config.has_voice = False
@@ -51,7 +51,7 @@ init python:
     config.start_callbacks.append(normalize_text_cps)
     config.after_load_callbacks.append(normalize_text_cps)
 
-    build.name = "PyeongonuiBang-0.2.0"
+    build.name = "PyeongonuiBang-Demo-0.2.0"
     build.executable_name = "PyeongonuiBang"
     build.include_update = False
     build.classify("game/tests.rpy", None)
@@ -60,16 +60,22 @@ init python:
     build.classify(".git/**", None)
     build.classify(".vscode/**", None)
     build.classify("test-results/**", None)
+    build.classify("build/**", None)
+    build.classify("dist/**", None)
+    build.classify("docs/**", None)
+    build.classify("AGENTS.md", None)
+    build.classify("**.zip", None)
     build.classify("game/saves/**", None)
     build.classify("game/cache/**", None)
     build.classify("**.log", None)
-    build.classify("**.txt", None)
     build.classify("game/fonts/*OFL.txt", "all")
-    build.classify("README.md", "all")
+    build.classify("**.txt", None)
+    build.classify("README.md", None)
+    build.classify("DEMO-README.md", "all")
     build.classify("CREDITS.md", "all")
     build.classify("**.rpy", "all")
     build.classify("**.rpyc", "all")
-    build.documentation("README.md")
+    build.documentation("DEMO-README.md")
     build.documentation("CREDITS.md")
     renpy.music.register_channel("ambience", mixer="sfx", loop=True)
     renpy.music.register_channel("foley", mixer="sfx", loop=False)
