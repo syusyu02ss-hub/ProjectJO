@@ -12,3 +12,6 @@
 *.md text eol=lf
 *.txt text eol=lf
 
+# README screenshots are ordinary Git files for direct GitHub rendering.
+docs/screenshots/*.png -filter -diff -merge -text
+

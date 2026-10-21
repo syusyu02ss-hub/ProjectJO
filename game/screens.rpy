@@ -174,8 +174,8 @@ screen menu_tabs():
     hbox:
         spacing 16
         if not main_menu:
-            textbutton "기록" action ShowMenu("notebook_menu") text_size 25
-            textbutton "기록" action ShowMenu("history") text_size 25
+            textbutton "조사 기록" action ShowMenu("notebook_menu") text_size 25
+            textbutton "지난 대사" action ShowMenu("history") text_size 25
             textbutton "저장" action ShowMenu("save") text_size 25
         textbutton "불러오기" action ShowMenu("load") text_size 25
         textbutton "설정" action ShowMenu("preferences") text_size 25
