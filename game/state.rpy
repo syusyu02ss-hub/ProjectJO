@@ -26,6 +26,19 @@ init python:
         ("drawer", "서랍장", 1733, 660),
     ]
 
+    # 1920×1080 기준 실제 사물 영역. 표시용 좌표(OBJECTS)와 분리한다.
+    # 작은 표시점을 정확히 누르지 않아도 조사되며, 인접 대상끼리는 겹치지 않는다.
+    INVESTIGATION_BOUNDS = {
+        "window": (0, 60, 355, 500),
+        "cup": (500, 650, 185, 150),
+        "clock": (555, 235, 175, 170),
+        "door": (810, 270, 310, 525),
+        "light": (885, 165, 170, 100),
+        "panel": (1220, 285, 170, 240),
+        "button": (1120, 430, 100, 155),
+        "drawer": (1590, 590, 330, 270),
+    }
+
     REQUIRED_OBSERVATIONS = tuple(key for key, _title, _x, _y in OBJECTS)
 
     def has(clue):

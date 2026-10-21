@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import shutil
 import zipfile
+from windows_icon import embed_icon
 
 
 def main():
@@ -21,7 +22,7 @@ def main():
     output = args.output.resolve()
     # Never clean/overwrite an earlier release or the working tree.
     output.mkdir(parents=True, exist_ok=False)
-    name = "PyeongonuiBang-Demo-0.2.0-win"
+    name = "평온의방_데모_v0.2.1_Windows"
     package = output / name
     package.mkdir()
 
@@ -31,8 +32,8 @@ def main():
         shutil.copy2(source, target)
 
     # Match the launch layout used by Ren'Py's Distributor.add_windows_files.
-    copy(sdk / "lib/py3-windows-x86_64/renpy.exe", "PyeongonuiBang.exe")
-    copy(sdk / "renpy.py", "PyeongonuiBang.py")
+    copy(sdk / "lib/py3-windows-x86_64/renpy.exe", "평온의 방.exe")
+    copy(sdk / "renpy.py", "평온의 방.py")
     for folder in ("renpy", "lib/python3.12", "lib/py3-windows-x86_64"):
         for source in sorted((sdk / folder).rglob("*")):
             if not source.is_file():
@@ -46,6 +47,8 @@ def main():
                 continue
             copy(source, relative)
     copy(sdk / "LICENSE.txt", "renpy/LICENSE.txt")
+    embed_icon(package / "평온의 방.exe", project / "icon.ico")
+    embed_icon(package / "lib/py3-windows-x86_64/pythonw.exe", project / "icon.ico")
 
     for filename in ("script.rpy", "corridor_demo.rpy", "screens.rpy", "state.rpy", "options.rpy"):
         copy(project / "game" / filename, Path("game") / filename)
@@ -69,7 +72,10 @@ def main():
     with zipfile.ZipFile(archive) as z:
         assert z.testzip() is None, "ZIP integrity failure"
         entries = [Path(n).relative_to(name).as_posix() for n in z.namelist()]
-        assert "PyeongonuiBang.exe" in entries
+        assert "평온의 방.exe" in entries
+        assert "평온의 방.py" in entries
+        assert "game/images/app_icon.png" in entries
+        assert "game/images/room_cold_fhd.png" in entries
         assert "lib/py3-windows-x86_64/pythonw.exe" in entries
         assert "game/script_version.txt" in entries
         assert not any(n.startswith(("game/saves/", "game/cache/", "docs/", "tools/", ".git/"))
@@ -79,7 +85,7 @@ def main():
         assert "game/fonts/NanumPenScript-OFL.txt" in entries
     digest = hashlib.file_digest(archive.open("rb"), "sha256").hexdigest()
     (output / (archive.name + ".sha256")).write_text(
-        digest + "  " + archive.name + "\n", encoding="ascii"
+        digest + "  " + archive.name + "\n", encoding="utf-8"
     )
     print(f"Package: {archive}")
     print(f"ZIP verified: {len(entries)} files, {archive.stat().st_size:,} bytes")

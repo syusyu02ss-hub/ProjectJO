@@ -117,9 +117,10 @@ screen investigation():
     default hovered_object = ""
 
     for key, title, x, y in OBJECTS:
+        $ hit_x, hit_y, hit_width, hit_height = INVESTIGATION_BOUNDS[key]
         button:
             id ("inspect_" + key)
-            xpos x-63 ypos y-35 xsize 135 ysize 93
+            xpos hit_x ypos hit_y xsize hit_width ysize hit_height
             padding (0, 0)
             background None
             hover_background (Solid("#b7d1e126") if config.developer else None)
@@ -127,7 +128,8 @@ screen investigation():
             unhovered SetScreenVariable("hovered_object", "")
             action Return(key)
             vbox:
-                xalign .5 spacing 6
+                xpos (x - hit_x - 63) ypos (y - hit_y - 35)
+                xsize 135 spacing 6
                 if config.developer and (persistent.show_hotspots or hovered_object == key):
                     text ("·" if key in observed else "◇") xalign .5 size 35 color ("#9caeb7" if key in observed else "#e5eef3")
                     text title xalign .5 size 23 outlines [(3, "#101720ee", 0, 0)]
@@ -402,7 +404,7 @@ screen memory_portrait(expression, speaking=False):
             xysize=(560, 840),
             matrixcolor=(SaturationMatrix(.82) if speaking else SaturationMatrix(.58) * BrightnessMatrix(-.20)),
             alpha=(1.0 if speaking else .72)
-        ) xpos 1280 ypos 178
+        ) xpos 1280 ypos 48
 
 screen opened_door():
     zorder -1

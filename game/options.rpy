@@ -1,5 +1,6 @@
 define config.name = "평온의 방"
-define config.version = "0.2.0"
+define config.version = "0.2.1"
+define config.window_icon = "images/app_icon.png"
 define config.window_title = "평온의 방"
 define config.screen_width = 1920
 define config.screen_height = 1080
@@ -29,6 +30,15 @@ default persistent.show_hotspots = True
 default persistent.text_speed_settings_version = 0
 
 init python:
+    # V / Alt+V를 눌러 셀프 보이싱이 우발적으로 켜지지 않도록 한다.
+    config.keymap["self_voicing"] = []
+
+    def reset_self_voicing():
+        renpy.game.preferences.self_voicing = False
+
+    config.start_callbacks.append(reset_self_voicing)
+    config.after_load_callbacks.append(reset_self_voicing)
+
     TEXT_CPS_MIN = 2
     TEXT_CPS_MAX = 80
     TEXT_CPS_DEFAULT = 56
@@ -51,8 +61,8 @@ init python:
     config.start_callbacks.append(normalize_text_cps)
     config.after_load_callbacks.append(normalize_text_cps)
 
-    build.name = "PyeongonuiBang-Demo-0.2.0"
-    build.executable_name = "PyeongonuiBang"
+    build.name = "PyeongonuiBang-Demo-0.2.1"
+    build.executable_name = "평온의 방"
     build.include_update = False
     build.classify("game/tests.rpy", None)
     build.classify("game/tests.rpyc", None)
@@ -81,6 +91,7 @@ init python:
     renpy.music.register_channel("foley", mixer="sfx", loop=False)
 
 label before_main_menu:
+    $ reset_self_voicing()
     $ normalize_text_cps()
     return
 

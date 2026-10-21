@@ -4,10 +4,10 @@
 define su = Character("나", color="#a9bac2")
 define seo = Character("윤서아", color="#d3bcc0")
 
-image room = Transform("images/room_cold.png", xysize=(1920, 1080))
+image room = "images/room_cold_fhd.png"
 image black = Solid("#070b10")
 image room_after = Transform(
-    "images/room_cold.png",
+    "images/room_cold_fhd.png",
     xysize=(1920, 1080),
     matrixcolor=SaturationMatrix(.16) * BrightnessMatrix(-.42)
 )
