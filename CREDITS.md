@@ -15,7 +15,22 @@
 - 복도 데모: 기존 메뉴 복도를 어둡게 보정해 재사용. 발소리 2종과 둔한 타격음은 같은 합성 스크립트의 `--corridor-only` 옵션으로 생성한다.
 - 복도 정적 연출의 마지막 발소리와 낮은 불협화음은 `tools/make_audio.py --tension-only`로 생성한 합성 음원이다.
 - 복도 긴박한 선택의 `ticking_urgent.wav`는 `tools/make_audio.py --urgent-only`로 생성한다. 0.32초 간격의 틱/톡이며 문 앞 선택에는 사용하지 않는다.
-- 글꼴: 나눔고딕, 나눔명조, 나눔손글씨 펜. SIL Open Font License. `game/fonts/`에 라이선스 포함.
+- 글꼴: 아래 표와 라이선스 안내 참고.
 - 엔진: Ren’Py 8.5.3.
 
-이미지의 외부 배포 권한은 제공 원본의 이용 조건에 따릅니다.
+## 이미지 제작 출처
+
+2026-10-22 제작자 확인: 제공한 서아·수혁·로고·기존 방 이미지를 포함한 이미지 에셋은 생성형 AI로 제작한 자료다. 외부 작품이나 구매 이미지 에셋을 제공한 것은 아니다. UI 그라데이션 등은 코드로 생성했다. 이 출처 기록이 AI 결과물의 독점적 권리나 제3자 권리 비침해를 보증하는 것은 아니며, 생성 서비스의 이용 조건이 적용된다.
+
+## 글꼴과 재배포 조건
+
+파일 이름이 아니라 TTF 내부의 글꼴 이름과 저작권 표시를 확인했다. 글꼴은 게임에 동봉하며 별도로 판매하지 않는다.
+
+| 파일 | 실제 글꼴 · 권리자 | 동봉 라이선스 |
+| --- | --- | --- |
+| `NanumGothic-Regular.ttf` | 나눔고딕 · NHN | `game/fonts/NanumGothic-OFL.txt` |
+| `NanumMyeongjo.ttf` | 나눔명조 · NHN, FONTRIX 디자인 | `game/fonts/NanumMyeongjo-OFL.txt` |
+| `NanumPenScript-Regular.ttf` | 나눔손글씨 펜 · NHN | `game/fonts/NanumPenScript-OFL.txt` |
+| `NanumSmile.ttf` | 나눔손글씨 기쁨밝음 (Nanum GiBbeumBarkEum) · NAVER, CLOVA AI OCR Team | `game/fonts/NanumSmile-OFL.txt` |
+
+[네이버 공식 글꼴 안내](https://hangeul.naver.com/font)는 나눔글꼴과 클로바 나눔손글씨의 사용·프로그램 동봉·재배포를 허용하며, 재배포 시 저작권 안내와 라이선스 전문을 포함하도록 안내한다. [공식 라이선스 전문](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko)은 SIL Open Font License 1.1이다. 해당 고지와 전문을 배포 ZIP의 `game/fonts/`에도 포함한다. 확인일: 2026-10-22.

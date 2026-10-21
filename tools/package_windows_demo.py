@@ -83,6 +83,8 @@ def main():
         assert not any(n.startswith("game/") and n.endswith(".rpyc") for n in entries)
         assert "game/fonts/NanumGothic-OFL.txt" in entries
         assert "game/fonts/NanumPenScript-OFL.txt" in entries
+        assert "game/fonts/NanumMyeongjo-OFL.txt" in entries
+        assert "game/fonts/NanumSmile-OFL.txt" in entries
     digest = hashlib.file_digest(archive.open("rb"), "sha256").hexdigest()
     (output / (archive.name + ".sha256")).write_text(
         digest + "  " + archive.name + "\n", encoding="utf-8"

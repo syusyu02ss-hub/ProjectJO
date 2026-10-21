@@ -1,6 +1,6 @@
 # 평온의 방
 
-**정적과 발소리, 그리고 선택으로 긴장감을 만드는 1인칭 심리 공포·탈출 게임.**
+**정적과 발소리, 그리고 선택으로 긴장감을 만드는 탐색 중심의 심리 공포 어드벤처.**
 
 ![평온의 방 메인 메뉴](docs/screenshots/main-menu.png)
 
@@ -10,7 +10,7 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 장르 | 스토리 중심 심리 공포 · 포인트 앤 클릭 탈출 |
+| 장르 | 탐색 중심의 심리 공포 어드벤처 |
 | 플랫폼 | Windows 64비트 |
 | 엔진 | Ren'Py 8.5.3 / Python |
 | 언어 · 화면 | 한국어 / 1920 × 1080 기준 |
@@ -53,11 +53,13 @@
 
 ### 제출된 데모 플레이
 
-1. 포트폴리오에 첨부된 Windows 데모 ZIP을 폴더 전체로 압축 해제합니다.
+**[Windows 데모 v0.2.1 다운로드 (GitHub Releases)](https://github.com/syusyu02ss-hub/ProjectJO/releases/download/v0.2.1/ProjectJO_Demo_v0.2.1_Windows.zip)**
+
+1. 위 링크 또는 포트폴리오에 첨부된 Windows 데모 ZIP을 받아 폴더 전체로 압축 해제합니다.
 2. 폴더 안의 게임 실행 파일(`.exe`)을 실행합니다. 실행 파일만 다른 곳으로 옮기지 마세요.
 3. Ren'Py나 Python은 별도로 설치하지 않아도 됩니다.
 
-이 저장소의 `Code → Download ZIP`은 소스 코드입니다. 실행용 데모 ZIP과는 별개입니다. 상세 안내는 [데모 실행 안내](DEMO-README.md)를 참고하세요.
+이 저장소의 `Code → Download ZIP`은 소스 코드입니다. 실행용 데모는 위 GitHub Releases 링크를 이용하세요. 상세 안내는 [데모 실행 안내](DEMO-README.md)를 참고하세요.
 
 | 입력 | 동작 |
 | --- | --- |

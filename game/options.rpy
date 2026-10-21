@@ -4,6 +4,8 @@ define config.window_icon = "images/app_icon.png"
 define config.window_title = "평온의 방"
 define config.screen_width = 1920
 define config.screen_height = 1080
+# 배포 버전과 독립적인 저장 식별자. 기존 데모의 저장·설정을 이어 쓰도록 유지한다.
+# 모든 향후 스크립트 변경의 세이브 호환성을 보장한다는 뜻은 아니다.
 define config.save_directory = "PyeongonuiBang-2026" if config.developer else "PyeongonuiBang-Demo-0.2.0"
 define config.has_sound = True
 define config.has_music = True
